@@ -5,6 +5,7 @@
 */bin/
 */gen/
 /modules/*/*/*.gitignore
+.kotlin
 build
 bin
 gen
