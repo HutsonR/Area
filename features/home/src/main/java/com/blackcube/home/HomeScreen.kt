@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Timer
@@ -53,7 +54,9 @@ import coil.request.SuccessResult
 import com.blackcube.home.R
 import com.blackcube.common.ui.CustomActionButton
 import com.blackcube.common.ui.CustomActionButtonWithIcon
+import com.blackcube.common.ui.SectionTitle
 import com.blackcube.common.utils.CollectEffect
+import com.blackcube.core.navigation.Screens
 import com.blackcube.home.store.models.HomeEffect
 import com.blackcube.home.store.models.HomeIntent
 import com.blackcube.home.store.models.HomeState
@@ -92,7 +95,7 @@ fun HomeScreen(
     CollectEffect(effects) { effect ->
         when (effect) {
             is HomeEffect.NavigateToExcursion -> {
-
+                navController.navigate(Screens.TourScreen.createRoute(effect.id))
             }
         }
     }
@@ -196,20 +199,6 @@ fun PreviewHomeScreen() {
     }
 }
 
-@Composable
-fun SectionTitle(
-    text: String,
-    modifier: Modifier
-) {
-    Text(
-        text = text,
-        fontSize = 21.sp,
-        fontWeight = FontWeight.Bold,
-        color = colorResource(com.blackcube.common.R.color.title_color),
-        modifier = modifier
-    )
-}
-
 @Preview
 @Composable
 fun PreviewSectionTitle() {
@@ -262,8 +251,8 @@ fun CurrentQuestCard(
                 backgroundColor = colorResource(com.blackcube.common.R.color.purple),
                 textColor = Color.White,
                 iconColor = Color.White,
-                text = "Продолжить",
-                icon = Icons.Default.ArrowForward
+                text = stringResource(id = R.string.button_continue),
+                icon = Icons.AutoMirrored.Filled.ArrowForward
             )
         }
     }
@@ -330,14 +319,14 @@ fun MyAdventuresSection() {
             Column(modifier = Modifier.padding(12.dp)) {
                 Column(modifier = Modifier.padding(4.dp)) {
                     Text(
-                        text = "Мои приключения",
+                        text = stringResource(id = R.string.adventure_title),
                         fontSize = 21.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Хотите посмотреть на все туры и места, в которых побывали?",
+                        text = stringResource(id = R.string.adventure_text),
                         fontSize = 14.sp,
                         color = Color.White
                     )
@@ -349,7 +338,7 @@ fun MyAdventuresSection() {
                     onClick = {},
                     backgroundColor = Color.White,
                     textColor = Color.Black,
-                    text = "Конечно"
+                    text = stringResource(id = R.string.button_ofcourse)
                 )
             }
         }

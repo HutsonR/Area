@@ -4,4 +4,13 @@
     <string name="tour_title">Экскурсии</string>
 
     <string name="AR">AR</string>
+
+    <string name="progress_start">0%</string>
+    <string name="progress_end">100%</string>
+
+    <string name="adventure_title">Мои приключения</string>
+    <string name="adventure_text">Хотите посмотреть на все туры и места, в которых побывали?</string>
+
+    <string name="button_continue">Продолжить</string>
+    <string name="button_ofcourse">Конечно</string>
 </resources>

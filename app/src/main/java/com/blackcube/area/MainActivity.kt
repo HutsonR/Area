@@ -5,25 +5,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.blackcube.area.ui.theme.AreaTheme
-import com.blackcube.features.YandexMapKit
+import com.blackcube.core.navigation.Screens
 import com.blackcube.home.HomeScreenRoot
+import com.blackcube.tours.TourScreenRoot
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -42,6 +32,15 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable(Screens.MainScreen.route) {
                     HomeScreenRoot(navController = navController)
+                }
+                composable(
+                    route = Screens.TourScreen.route + "/{id}",
+                    arguments = listOf(navArgument("id") { type = NavType.StringType })) { stackEntry ->
+                    val itemId = Uri.decode(stackEntry.arguments?.getString("id"))
+                    TourScreenRoot(
+                        itemId ?: "",
+                        navController = navController
+                    )
                 }
             }
         }
