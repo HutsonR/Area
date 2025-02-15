@@ -13,7 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.blackcube.core.navigation.Screens
 import com.blackcube.home.HomeScreenRoot
-import com.blackcube.tours.intro.TourScreenRoot
+import com.blackcube.tours.intro.TourIntroScreenRoot
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                     route = Screens.TourScreen.route + "/{id}",
                     arguments = listOf(navArgument("id") { type = NavType.StringType })) { stackEntry ->
                     val itemId = Uri.decode(stackEntry.arguments?.getString("id"))
-                    TourScreenRoot(
+                    TourIntroScreenRoot(
                         itemId ?: "",
                         navController = navController
                     )

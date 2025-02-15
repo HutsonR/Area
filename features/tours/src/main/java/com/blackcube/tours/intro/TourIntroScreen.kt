@@ -67,7 +67,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun TourScreenRoot(
+fun TourIntroScreenRoot(
     tourId: String,
     navController: NavController,
     viewModel: TourIntroViewModel = hiltViewModel()
@@ -75,7 +75,7 @@ fun TourScreenRoot(
     val state by viewModel.state.collectAsState()
     val effects = viewModel.effect
 
-    TourScreen(
+    TourIntroScreen(
         navController = navController,
         state = state,
         effects = effects,
@@ -85,7 +85,7 @@ fun TourScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TourScreen(
+fun TourIntroScreen(
     navController: NavController,
     state: TourIntroState,
     effects: Flow<TourIntroEffect>,
