@@ -1,4 +1,4 @@
-package com.blackcube.tours
+package com.blackcube.tours.intro
 
 import android.content.Context
 import android.content.Intent
@@ -9,22 +9,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.pager.PagerSnapDistance
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.DirectionsWalk
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.DirectionsWalk
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Timer
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,7 +33,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,11 +40,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -70,10 +58,11 @@ import com.blackcube.common.ui.CustomActionButton
 import com.blackcube.common.ui.SectionTitle
 import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.utils.CollectEffect
-import com.blackcube.tours.components.SheetContentHistory
-import com.blackcube.tours.store.models.TourEffect
-import com.blackcube.tours.store.models.TourIntent
-import com.blackcube.tours.store.models.TourState
+import com.blackcube.tours.R
+import com.blackcube.tours.common.components.SheetContentHistory
+import com.blackcube.tours.intro.store.models.TourIntroEffect
+import com.blackcube.tours.intro.store.models.TourIntroIntent
+import com.blackcube.tours.intro.store.models.TourIntroState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
@@ -81,7 +70,7 @@ import kotlinx.coroutines.flow.Flow
 fun TourScreenRoot(
     tourId: String,
     navController: NavController,
-    viewModel: TourViewModel = hiltViewModel()
+    viewModel: TourIntroViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     val effects = viewModel.effect
@@ -98,9 +87,9 @@ fun TourScreenRoot(
 @Composable
 fun TourScreen(
     navController: NavController,
-    state: TourState,
-    effects: Flow<TourEffect>,
-    onIntent: (TourIntent) -> Unit
+    state: TourIntroState,
+    effects: Flow<TourIntroEffect>,
+    onIntent: (TourIntroIntent) -> Unit
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
@@ -110,18 +99,18 @@ fun TourScreen(
 
     CollectEffect(effects) { effect ->
         when (effect) {
-            TourEffect.NavigateToBack -> navController.popBackStack()
+            TourIntroEffect.NavigateToBack -> navController.popBackStack()
             
-            is TourEffect.NavigateToStartTour -> Unit
+            is TourIntroEffect.NavigateToStartTourIntro -> Unit
 
-            is TourEffect.ShowAlert -> {
+            is TourIntroEffect.ShowAlert -> {
                 if (!alertHandled) {
                     showAlert = true
                     alertHandled = true
                 }
             }
 
-            is TourEffect.ShowMap -> navigateToMap(
+            is TourIntroEffect.ShowMap -> navigateToMap(
                 request = effect.request,
                 context = context
             )
@@ -147,9 +136,9 @@ fun TourScreen(
             state.selectedHistory?.let {
                 SheetContentHistory(
                     historyModel = it,
-                    onClickShowMap = { onIntent(TourIntent.OnShowMapClick) }
+                    onClickShowMap = { onIntent(TourIntroIntent.OnShowMapClick) }
                 )
-            } ?: onIntent(TourIntent.ShowAlert)
+            } ?: onIntent(TourIntroIntent.ShowAlert)
 //            onIntent(TourIntent.ShowAlert)
         }
     }
@@ -186,7 +175,7 @@ fun TourScreen(
                 HistoryItem(
                     onClick = {
                         isSheetOpen = !isSheetOpen
-                        onIntent(TourIntent.OnHistoryItemClick(item))
+                        onIntent(TourIntroIntent.OnHistoryItemClick(item))
                     },
                     number = index + 1,
                     title = item.title,
@@ -195,7 +184,7 @@ fun TourScreen(
             }
             item {
                 CustomActionButton(
-                    onClick = { onIntent(TourIntent.OnStartTourClick) },
+                    onClick = { onIntent(TourIntroIntent.OnStartTourIntroClick) },
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 30.dp),
                     backgroundColor = colorResource(com.blackcube.common.R.color.purple),
                     textColor = Color.White,
@@ -204,7 +193,7 @@ fun TourScreen(
             }
         }
 
-        BackButton(onBackClick = { onIntent(TourIntent.OnBackClick) })
+        BackButton(onBackClick = { onIntent(TourIntroIntent.OnBackClick) })
     }
 }
 

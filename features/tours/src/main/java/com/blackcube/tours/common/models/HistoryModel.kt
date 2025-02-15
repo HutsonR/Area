@@ -1,4 +1,4 @@
-package com.blackcube.tours.models
+package com.blackcube.tours.common.models
 
 data class HistoryModel(
     val id: String,

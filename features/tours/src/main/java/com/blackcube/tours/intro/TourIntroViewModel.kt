@@ -1,17 +1,17 @@
-package com.blackcube.tours
+package com.blackcube.tours.intro
 
 import com.blackcube.core.BaseViewModel
-import com.blackcube.tours.models.HistoryModel
-import com.blackcube.tours.store.models.TourEffect
-import com.blackcube.tours.store.models.TourIntent
-import com.blackcube.tours.store.models.TourState
+import com.blackcube.tours.common.models.HistoryModel
+import com.blackcube.tours.intro.store.models.TourIntroEffect
+import com.blackcube.tours.intro.store.models.TourIntroIntent
+import com.blackcube.tours.intro.store.models.TourIntroState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class TourViewModel @Inject constructor(
+class TourIntroViewModel @Inject constructor(
 
-) : BaseViewModel<TourState, TourEffect>(TourState()) {
+) : BaseViewModel<TourIntroState, TourIntroEffect>(TourIntroState()) {
 
     init {
         modifyState {
@@ -78,13 +78,13 @@ class TourViewModel @Inject constructor(
         return "$BASE_MAP_REQUEST$lat,$lon"
     }
 
-    fun handleIntent(tourIntent: TourIntent) {
-        when(tourIntent) {
-            is TourIntent.OnHistoryItemClick -> modifyState { copy(selectedHistory = tourIntent.item) }
-            is TourIntent.OnStartTourClick -> effect(TourEffect.NavigateToStartTour(getState().id))
-            TourIntent.OnBackClick -> effect(TourEffect.NavigateToBack)
-            TourIntent.ShowAlert -> effect(TourEffect.ShowAlert)
-            TourIntent.OnShowMapClick -> effect(TourEffect.ShowMap(createMapRequest()))
+    fun handleIntent(tourIntroIntent: TourIntroIntent) {
+        when(tourIntroIntent) {
+            is TourIntroIntent.OnHistoryItemClick -> modifyState { copy(selectedHistory = tourIntroIntent.item) }
+            is TourIntroIntent.OnStartTourIntroClick -> effect(TourIntroEffect.NavigateToStartTourIntro(getState().id))
+            TourIntroIntent.OnBackClick -> effect(TourIntroEffect.NavigateToBack)
+            TourIntroIntent.ShowAlert -> effect(TourIntroEffect.ShowAlert)
+            TourIntroIntent.OnShowMapClick -> effect(TourIntroEffect.ShowMap(createMapRequest()))
         }
     }
 

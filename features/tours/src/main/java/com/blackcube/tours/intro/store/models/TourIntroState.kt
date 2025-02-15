@@ -1,8 +1,8 @@
-package com.blackcube.tours.store.models
+package com.blackcube.tours.intro.store.models
 
-import com.blackcube.tours.models.HistoryModel
+import com.blackcube.tours.common.models.HistoryModel
 
-data class TourState(
+data class TourIntroState(
     val id: String = "",
     val imageUrl: String = "",
     val title: String = "",

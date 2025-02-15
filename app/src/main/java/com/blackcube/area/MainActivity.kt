@@ -13,7 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.blackcube.core.navigation.Screens
 import com.blackcube.home.HomeScreenRoot
-import com.blackcube.tours.TourScreenRoot
+import com.blackcube.tours.intro.TourScreenRoot
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

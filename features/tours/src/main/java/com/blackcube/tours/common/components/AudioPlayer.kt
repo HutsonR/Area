@@ -1,4 +1,4 @@
-package com.blackcube.tours.components
+package com.blackcube.tours.common.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

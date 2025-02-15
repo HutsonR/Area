@@ -1,4 +1,4 @@
-package com.blackcube.tours.components
+package com.blackcube.tours.common.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.blackcube.common.ui.CustomActionButtonWithIcon
 import com.blackcube.tours.R
-import com.blackcube.tours.models.HistoryModel
+import com.blackcube.tours.common.models.HistoryModel
 
 @Composable
 fun SheetContentHistory(
