@@ -24,6 +24,8 @@ androidxHiltNavigationCompose = "1.2.0"
 yandex-map = "4.10.1-lite"
 # Coil
 coil = "2.5.0"
+# Player
+exoplayer = "1.5.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -63,6 +65,9 @@ maps = { group = "com.yandex.android", name = "maps.mobile", version.ref = "yand
 
 # Coil
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+
+# Player
+exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "exoplayer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -20,13 +20,14 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun CustomActionButton(
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     backgroundColor: Color,
     textColor: Color,
     text: String
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(46.dp),
         shape = RoundedCornerShape(12.dp),
