@@ -58,8 +58,11 @@ import com.blackcube.common.ui.CustomActionButton
 import com.blackcube.common.ui.SectionTitle
 import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.utils.CollectEffect
+import com.blackcube.core.navigation.Screens
 import com.blackcube.tours.R
 import com.blackcube.tours.common.components.SheetContentHistory
+import com.blackcube.tours.common.utils.MapUtil
+import com.blackcube.tours.common.utils.MapUtil.navigateToMap
 import com.blackcube.tours.intro.store.models.TourIntroEffect
 import com.blackcube.tours.intro.store.models.TourIntroIntent
 import com.blackcube.tours.intro.store.models.TourIntroState
@@ -101,7 +104,9 @@ fun TourIntroScreen(
         when (effect) {
             TourIntroEffect.NavigateToBack -> navController.popBackStack()
             
-            is TourIntroEffect.NavigateToStartTourIntro -> Unit
+            is TourIntroEffect.NavigateToStartTourIntro -> {
+                navController.navigate(Screens.TourRouteScreen.createRoute(effect.id))
+            }
 
             is TourIntroEffect.ShowAlert -> {
                 if (!alertHandled) {
@@ -489,6 +494,7 @@ fun HistoryItem(
                 horizontal = 20.dp,
                 vertical = 3.dp
             )
+            .clip(RoundedCornerShape(16.dp))
             .clickable { onClick.invoke() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
@@ -534,11 +540,4 @@ fun HistoryItemPreview() {
         title = "Какой-то заголовок истории",
         description = "Описание истории очень очень оооочень длинное, нужно просто создать эффект многоточья"
     )
-}
-
-private fun navigateToMap(request: String, context: Context) {
-    Uri.parse(request).let {
-        val intent = Intent(Intent.ACTION_VIEW, it)
-        context.startActivity(intent)
-    }
 }

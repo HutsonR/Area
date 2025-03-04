@@ -1,6 +1,7 @@
 package com.blackcube.tours.intro
 
 import com.blackcube.core.BaseViewModel
+import com.blackcube.tours.common.domain.MapUseCase
 import com.blackcube.tours.common.models.HistoryModel
 import com.blackcube.tours.intro.store.models.TourIntroEffect
 import com.blackcube.tours.intro.store.models.TourIntroIntent
@@ -10,13 +11,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TourIntroViewModel @Inject constructor(
-
+    private val mapUseCase: MapUseCase
 ) : BaseViewModel<TourIntroState, TourIntroEffect>(TourIntroState()) {
 
     init {
         modifyState {
             copy(
-                id = "",
+                id = "123",
                 imageUrl = "https://i.pinimg.com/originals/29/36/06/2936068fffd819ba4c2abeaf7dd04206.png",
                 title = "Легенды подземелий",
                 description = "Погрузитесь в мрачные подземелья и разгадайте тайны прошлого",
@@ -72,23 +73,20 @@ class TourIntroViewModel @Inject constructor(
         }
     }
 
-    private fun createMapRequest(): String {
-        val lat = getState().selectedHistory?.lat
-        val lon = getState().selectedHistory?.lon
-        return "$BASE_MAP_REQUEST$lat,$lon"
-    }
-
     fun handleIntent(tourIntroIntent: TourIntroIntent) {
         when(tourIntroIntent) {
             is TourIntroIntent.OnHistoryItemClick -> modifyState { copy(selectedHistory = tourIntroIntent.item) }
             is TourIntroIntent.OnStartTourIntroClick -> effect(TourIntroEffect.NavigateToStartTourIntro(getState().id))
             TourIntroIntent.OnBackClick -> effect(TourIntroEffect.NavigateToBack)
             TourIntroIntent.ShowAlert -> effect(TourIntroEffect.ShowAlert)
-            TourIntroIntent.OnShowMapClick -> effect(TourIntroEffect.ShowMap(createMapRequest()))
+            TourIntroIntent.OnShowMapClick -> effect(
+                TourIntroEffect.ShowMap(
+                    mapUseCase.createMapRequest(
+                        getState().selectedHistory?.lat,
+                        getState().selectedHistory?.lon
+                    )
+                )
+            )
         }
-    }
-
-    companion object {
-        private const val BASE_MAP_REQUEST = "geo:0,0?q="
     }
 }

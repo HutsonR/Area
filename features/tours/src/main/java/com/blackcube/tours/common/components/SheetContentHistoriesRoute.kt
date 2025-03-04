@@ -2,6 +2,7 @@ package com.blackcube.tours.common.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,16 +11,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,7 +33,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.blackcube.common.ui.CustomActionButtonWithIcon
 import com.blackcube.tours.R
 import com.blackcube.tours.common.models.HistoryModel
 import com.blackcube.tours.common.models.HistoryRouteModel
@@ -41,13 +40,13 @@ import com.blackcube.tours.common.models.HistoryRouteModel
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SheetContentHistoriesRoute(
+    onHistoryItemClick: (HistoryModel) -> Unit = {},
     historyRouteModel: HistoryRouteModel
 ) {
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
             .navigationBarsPadding(),
     ) {
         stickyHeader {
@@ -68,7 +67,7 @@ fun SheetContentHistoriesRoute(
         }
         itemsIndexed(historyRouteModel.histories, key = { _, item -> item.id }) { index, item ->
             HistoryItem(
-                onClick = { },
+                onClick = { onHistoryItemClick.invoke(item) },
                 number = index + 1,
                 title = item.title,
                 description = item.description
@@ -98,10 +97,19 @@ fun HistoryItem(
             modifier = Modifier.padding(14.dp)
         ) {
             Text(
-                text = "${number}.",
+                text = "$number",
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .border(
+                        width = 1.dp,
+                        color = colorResource(id = com.blackcube.common.R.color.dark_purple),
+                        shape = CircleShape
+                    )
+                    .wrapContentSize(Alignment.Center),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = colorResource(com.blackcube.common.R.color.title_color),
+                color = colorResource(id = com.blackcube.common.R.color.title_color)
             )
             Column(
                 modifier = Modifier.padding(start = 10.dp)

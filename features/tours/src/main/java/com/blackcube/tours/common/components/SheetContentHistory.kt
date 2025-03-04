@@ -25,7 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.blackcube.common.ui.CustomActionButtonWithIcon
 import com.blackcube.tours.R
+import com.blackcube.tours.common.components.player.AudioPlayer
 import com.blackcube.tours.common.models.HistoryModel
+import com.blackcube.tours.common.models.Track
 
 @Composable
 fun SheetContentHistory(
@@ -39,21 +41,19 @@ fun SheetContentHistory(
             .padding(horizontal = 20.dp)
             .navigationBarsPadding()
     ) {
-//        Spacer(modifier = Modifier.height(16.dp))
-//        HorizontalDivider(
-//            modifier = Modifier
-//                .width(80.dp)
-//                .align(Alignment.CenterHorizontally)
-//                .clip(RoundedCornerShape(10.dp)),
-//            thickness = 4.dp,
-//            color = colorResource(id = com.blackcube.common.R.color.divider_color)
-//        )
+        val path = "android.resource://" + "com.blackcube.area" + "/" + R.raw.track
+        AudioPlayer(
+            track = Track(
+                name = historyModel.title,
+                url = path
+            )
+        )
         Text(
             text = historyModel.title,
             color = colorResource(id = com.blackcube.common.R.color.title_color),
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(bottom = 20.dp)
+            modifier = Modifier.padding(top= 20.dp, bottom = 20.dp)
         )
         Text(
             text = historyModel.description,

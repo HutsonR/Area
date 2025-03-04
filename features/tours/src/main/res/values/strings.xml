@@ -4,6 +4,7 @@
     <string name="status_completed">Пройдено</string>
 
     <string name="ar_available">Доступен AR-режим!</string>
+    <string name="ar_mode">AR-режим</string>
     <string name="history_title">Истории</string>
 
     <string name="history_go_button">По машинам</string>

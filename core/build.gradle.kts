@@ -57,7 +57,4 @@ dependencies {
     api(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     api(libs.androidx.hilt.navigation.compose)
-
-    // maps
-    api(libs.maps)
 }

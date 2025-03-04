@@ -14,6 +14,8 @@ import androidx.navigation.navArgument
 import com.blackcube.core.navigation.Screens
 import com.blackcube.home.HomeScreenRoot
 import com.blackcube.tours.intro.TourIntroScreenRoot
+import com.blackcube.tours.route.TourRouteScreenRoot
+import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,10 +36,19 @@ class MainActivity : ComponentActivity() {
                     HomeScreenRoot(navController = navController)
                 }
                 composable(
-                    route = Screens.TourScreen.route + "/{id}",
+                    route = Screens.TourIntroScreen.route + "/{id}",
                     arguments = listOf(navArgument("id") { type = NavType.StringType })) { stackEntry ->
                     val itemId = Uri.decode(stackEntry.arguments?.getString("id"))
                     TourIntroScreenRoot(
+                        itemId ?: "",
+                        navController = navController
+                    )
+                }
+                composable(
+                    route = Screens.TourRouteScreen.route + "/{id}",
+                    arguments = listOf(navArgument("id") { type = NavType.StringType })) { stackEntry ->
+                    val itemId = Uri.decode(stackEntry.arguments?.getString("id"))
+                    TourRouteScreenRoot(
                         itemId ?: "",
                         navController = navController
                     )

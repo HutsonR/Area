@@ -7,11 +7,10 @@ import kotlin.coroutines.CoroutineContext
 
 fun safeExecute(
     context: CoroutineContext = IO,
-    scope: CoroutineScope = CoroutineScope(context),
-    block: () -> Unit
-) = scope.launch(context) {
+    block: suspend () -> Unit
+) = CoroutineScope(context).launch {
     try {
-
+        block()
     } catch (e: Exception) {
         e.printStackTrace()
     }
