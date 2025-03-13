@@ -7,7 +7,7 @@
     <string name="ar_mode">AR-режим</string>
     <string name="history_title">Истории</string>
 
-    <string name="history_go_button">По машинам</string>
+    <string name="history_go_button">Погнали</string>
 
     <string name="history_route_title">Маршрут тура</string>
     <string name="history_detail_show_map">Показать в картах</string>

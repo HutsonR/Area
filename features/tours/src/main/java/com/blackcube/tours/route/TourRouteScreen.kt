@@ -1,6 +1,5 @@
 package com.blackcube.tours.route
 
-import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -29,7 +28,6 @@ import com.blackcube.common.utils.CollectEffect
 import com.blackcube.tours.common.components.SheetContentHistoriesRoute
 import com.blackcube.tours.common.components.SheetContentHistory
 import com.blackcube.tours.common.components.YandexMapScreen
-import com.blackcube.tours.common.components.TourPoint
 import com.blackcube.tours.common.models.HistoryRouteModel
 import com.blackcube.tours.common.utils.MapUtil.navigateToMap
 import com.blackcube.tours.route.components.MapArButton
@@ -65,8 +63,8 @@ fun TourRouteScreen(
     onIntent: (TourRouteIntent) -> Unit
 ) {
     val context = LocalContext.current
-    val sheetState = rememberModalBottomSheetState()
-    var isSheetOpen by rememberSaveable { mutableStateOf(false) }
+    val selectedSheetState = rememberModalBottomSheetState()
+    var isSelectedSheetVisible by rememberSaveable { mutableStateOf(false) }
     var showAlert by remember { mutableStateOf(false) }
     var alertHandled by remember { mutableStateOf(false) }
 
@@ -87,8 +85,6 @@ fun TourRouteScreen(
             )
 
             TourRouteEffect.SwitchArMode -> Unit
-            TourRouteEffect.ZoomMinus -> Unit
-            TourRouteEffect.ZoomPlus -> Unit
         }
     }
 
@@ -101,12 +97,12 @@ fun TourRouteScreen(
         )
     }
 
-    if (isSheetOpen) {
+    if (isSelectedSheetVisible) {
         ModalBottomSheet(
-            sheetState = sheetState,
+            sheetState = selectedSheetState,
             containerColor = colorResource(id = com.blackcube.common.R.color.white),
             windowInsets = WindowInsets(0.dp),
-            onDismissRequest = { isSheetOpen = !isSheetOpen }
+            onDismissRequest = { isSelectedSheetVisible = !isSelectedSheetVisible }
         ) {
             state.selectedHistory?.let {
                 SheetContentHistory(
@@ -123,8 +119,8 @@ fun TourRouteScreen(
         sheetContent = {
             SheetContentHistoriesRoute(
                 onHistoryItemClick = {
-                    isSheetOpen = !isSheetOpen
-                    onIntent(TourRouteIntent.OnHistoryItemClick(it))
+                    isSelectedSheetVisible = !isSelectedSheetVisible
+                    onIntent(TourRouteIntent.OnHistoryItemClick(it.id))
                 },
                 historyRouteModel = HistoryRouteModel(
                     id = "",
@@ -135,13 +131,11 @@ fun TourRouteScreen(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             YandexMapScreen(
-                points = listOf(
-                    TourPoint(1,47.2357, 39.7015, "Название точки"),
-                    TourPoint(2,47.236732, 39.706941, "Работает?")
-                ),
+                points = state.mapPoints,
                 isDarkMode = isSystemInDarkTheme()
             ) {
-                Toast.makeText(context, "Точка: ${it.title}", Toast.LENGTH_SHORT).show()
+                isSelectedSheetVisible = !isSelectedSheetVisible
+                onIntent(TourRouteIntent.OnHistoryItemClick(it.id))
             }
             Box(
                 modifier = Modifier

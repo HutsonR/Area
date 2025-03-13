@@ -9,9 +9,5 @@ sealed interface TourRouteEffect {
         val request: String
     ) : TourRouteEffect
 
-    data object ZoomPlus : TourRouteEffect
-
-    data object ZoomMinus : TourRouteEffect
-
     data object SwitchArMode : TourRouteEffect
 }
