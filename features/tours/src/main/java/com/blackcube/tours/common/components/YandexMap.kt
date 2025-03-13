@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +18,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraListener
@@ -32,10 +34,32 @@ private object MapDefaults {
 
 data class MapPoint(val id: String, val latitude: Double, val longitude: Double, val title: String)
 
+/**
+ * A composable function that displays a Yandex Map with markers.
+ *
+ * @param points A list of [MapPoint] objects representing the locations to display on the map.
+ * @param isDarkMode A boolean indicating whether to use dark mode for the map.
+ * @param onMarkerClick A lambda function that is called when a marker on the map is clicked.
+ *                      It receives the clicked [MapPoint] as a parameter.
+ *
+ * This function initializes the Yandex MapKit, creates a [MapView], adds placemarks (markers)
+ * for each point in the `points` list, and sets up listeners for camera movement and marker clicks.
+ * It also handles the display of labels based on the zoom level, showing them when zoomed in
+ * (zoom >= 14) and hiding them when zoomed out (zoom < 14).
+ *
+ * Lifecycle management:
+ * - It ensures proper initialization and cleanup of the MapKit based on the lifecycle of the
+ *   Composable, starting and stopping the map when the lifecycle owner is started or stopped.
+ * - It also listens to the camera position changes to dynamically change text labels visibility
+ *
+ * Features:
+ * - Displays multiple markers on the map.
+ * - Supports dark mode. */
 @Composable
 fun YandexMapScreen(
     points: List<MapPoint>,
     isDarkMode: Boolean,
+    currentLocation: Point? = null,
     onMarkerClick: (MapPoint) -> Unit
 ) {
     val context = LocalContext.current
@@ -135,6 +159,16 @@ fun YandexMapScreen(
         mv.mapWindow.map.move(CameraPosition(targetPoint, 13f, 340.0f, 30.0f))
     }
 
+    LaunchedEffect(currentLocation) {
+        currentLocation?.let { location ->
+            mapView.mapWindow.map.move(
+                CameraPosition(location, 16f, 340.0f, 30.0f),
+                Animation(Animation.Type.SMOOTH, 1.0f),
+                null
+            )
+        }
+    }
+
     // Подписываемся на события жизненного цикла для корректной работы карты
     DisposableEffect(lifecycleOwner) {
         val lifecycle = lifecycleOwner.lifecycle
@@ -167,6 +201,15 @@ fun YandexMapScreen(
     }
 }
 
+/**
+ * Creates a Bitmap representing a numbered marker.
+ *
+ * This function generates a circular bitmap with a specified number displayed in the center.
+ *
+ * @param context The application context, used for accessing resources like display metrics.
+ * @param number The number to be displayed on the marker.
+ * @return A Bitmap object representing the numbered marker.
+ */
 fun createNumberedMarkerBitmap(context: Context, number: Int): Bitmap {
     val sizeDp = 36
     val px = (sizeDp * context.resources.displayMetrics.density).toInt()

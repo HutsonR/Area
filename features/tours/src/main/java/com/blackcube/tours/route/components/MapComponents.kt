@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -16,9 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -69,8 +66,9 @@ import com.blackcube.tours.R
 //}
 
 @Composable
-fun MapBackButton(
+fun MapControlButton(
     modifier: Modifier = Modifier,
+    icon: ImageVector,
     onClick: () -> Unit
 ) {
     Card(
@@ -87,7 +85,7 @@ fun MapBackButton(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                imageVector = icon,
                 contentDescription = "Map Control Icon",
                 tint = colorResource(id = com.blackcube.common.R.color.black),
                 modifier = Modifier
@@ -137,24 +135,13 @@ fun MapArButton(
     }
 }
 
-//@Composable
-//@Preview
-//fun MapPlusButtonPreview() {
-//    Box(modifier = Modifier.size(100.dp).background(Color.White), contentAlignment = Alignment.Center) {
-//        MapControlButton(icon = Icons.Default.Add) {}
-//    }
-//}
-//
-//@Composable
-//@Preview
-//fun MapMinusButtonPreview() {
-//    MapControlButton(icon = Icons.Default.Remove) {}
-//}
-
 @Composable
 @Preview
-fun MapBackButtonPreview() {
-    MapBackButton {}
+fun MapControlPreview() {
+    Row {
+        MapControlButton(icon = Icons.AutoMirrored.Filled.ArrowBack) {}
+        MapControlButton(icon = Icons.Filled.LocationOn) {}
+    }
 }
 
 @Composable

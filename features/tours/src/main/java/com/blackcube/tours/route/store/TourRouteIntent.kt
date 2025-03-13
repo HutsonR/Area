@@ -7,6 +7,8 @@ sealed interface TourRouteIntent {
 
     data object OnBackClick: TourRouteIntent
 
+    data object OnCurrentLocationClick: TourRouteIntent
+
     data object OnShowMapClick : TourRouteIntent
 
     data object ShowAlert : TourRouteIntent

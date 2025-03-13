@@ -73,10 +73,15 @@ class TourIntroViewModel @Inject constructor(
         }
     }
 
+    private fun onStartTourClick() {
+        // todo в будущем пометить текущий тур, как начатый для отображения на главном экране
+        effect(TourIntroEffect.NavigateToStartTour(getState().id))
+    }
+
     fun handleIntent(tourIntroIntent: TourIntroIntent) {
         when(tourIntroIntent) {
             is TourIntroIntent.OnHistoryItemClick -> modifyState { copy(selectedHistory = tourIntroIntent.item) }
-            is TourIntroIntent.OnStartTourIntroClick -> effect(TourIntroEffect.NavigateToStartTourIntro(getState().id))
+            is TourIntroIntent.OnStartTourClick -> onStartTourClick()
             TourIntroIntent.OnBackClick -> effect(TourIntroEffect.NavigateToBack)
             TourIntroIntent.ShowAlert -> effect(TourIntroEffect.ShowAlert)
             TourIntroIntent.OnShowMapClick -> effect(

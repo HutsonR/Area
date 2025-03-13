@@ -1,5 +1,7 @@
 package com.blackcube.tours.route
 
+import android.content.Context
+import androidx.lifecycle.viewModelScope
 import com.blackcube.core.BaseViewModel
 import com.blackcube.tours.common.components.MapPoint
 import com.blackcube.tours.common.domain.MapUseCase
@@ -8,11 +10,14 @@ import com.blackcube.tours.route.store.TourRouteEffect
 import com.blackcube.tours.route.store.TourRouteIntent
 import com.blackcube.tours.route.store.TourRouteState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TourRouteViewModel @Inject constructor(
-    private val mapUseCase: MapUseCase
+    private val mapUseCase: MapUseCase,
+    @ApplicationContext private val appContext: Context
 ) : BaseViewModel<TourRouteState, TourRouteEffect>(TourRouteState()) {
 
     private val prepareHistories = listOf(
@@ -74,7 +79,9 @@ class TourRouteViewModel @Inject constructor(
     fun handleIntent(tourRouteIntent: TourRouteIntent) {
         when (tourRouteIntent) {
             is TourRouteIntent.OnHistoryItemClick -> setSelectedHistory(tourRouteIntent.historyId)
+
             TourRouteIntent.OnBackClick -> effect(TourRouteEffect.NavigateToBack)
+
             TourRouteIntent.OnShowMapClick -> effect(
                 TourRouteEffect.ShowMap(
                     mapUseCase.createMapRequest(
@@ -83,8 +90,24 @@ class TourRouteViewModel @Inject constructor(
                     )
                 )
             )
+
             TourRouteIntent.ShowAlert -> effect(TourRouteEffect.ShowAlert)
+
             TourRouteIntent.OnArClick -> effect(TourRouteEffect.SwitchArMode)
+
+            TourRouteIntent.OnCurrentLocationClick -> setCurrentLocation()
+        }
+    }
+
+    private fun setCurrentLocation() {
+        viewModelScope.launch {
+            try {
+                val currentLocation = mapUseCase.getCurrentPoint(context = appContext)
+                modifyState { copy(currentLocation = currentLocation) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                effect(TourRouteEffect.ShowAlert)
+            }
         }
     }
 

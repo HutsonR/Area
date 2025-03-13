@@ -5,7 +5,7 @@ sealed interface TourIntroEffect {
 
     data object ShowAlert : TourIntroEffect
 
-    data class NavigateToStartTourIntro(
+    data class NavigateToStartTour(
         val id: String
     ) : TourIntroEffect
 

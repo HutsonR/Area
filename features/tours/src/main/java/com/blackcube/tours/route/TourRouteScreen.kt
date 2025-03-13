@@ -4,7 +4,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -18,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -31,7 +37,7 @@ import com.blackcube.tours.common.components.YandexMapScreen
 import com.blackcube.tours.common.models.HistoryRouteModel
 import com.blackcube.tours.common.utils.MapUtil.navigateToMap
 import com.blackcube.tours.route.components.MapArButton
-import com.blackcube.tours.route.components.MapBackButton
+import com.blackcube.tours.route.components.MapControlButton
 import com.blackcube.tours.route.store.TourRouteEffect
 import com.blackcube.tours.route.store.TourRouteIntent
 import com.blackcube.tours.route.store.TourRouteState
@@ -63,20 +69,19 @@ fun TourRouteScreen(
     onIntent: (TourRouteIntent) -> Unit
 ) {
     val context = LocalContext.current
-    val selectedSheetState = rememberModalBottomSheetState()
-    var isSelectedSheetVisible by rememberSaveable { mutableStateOf(false) }
-    var showAlert by remember { mutableStateOf(false) }
-    var alertHandled by remember { mutableStateOf(false) }
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+
+    val historySheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var isHistorySheetOpen by rememberSaveable { mutableStateOf(false) }
+    var isAlertVisible by remember { mutableStateOf(false) }
 
     CollectEffect(effects) { effect ->
         when (effect) {
             TourRouteEffect.NavigateToBack -> navController.popBackStack()
 
             is TourRouteEffect.ShowAlert -> {
-                if (!alertHandled) {
-                    showAlert = true
-                    alertHandled = true
-                }
+                isAlertVisible = true
             }
 
             is TourRouteEffect.ShowMap -> navigateToMap(
@@ -88,21 +93,20 @@ fun TourRouteScreen(
         }
     }
 
-    if (showAlert) {
+    if (isAlertVisible) {
         ShowAlertDialog(
             onButtonClick = {
-                showAlert = false
-                alertHandled = true
+                isAlertVisible = false
             }
         )
     }
 
-    if (isSelectedSheetVisible) {
+    if (isHistorySheetOpen) {
         ModalBottomSheet(
-            sheetState = selectedSheetState,
+            sheetState = historySheetState,
             containerColor = colorResource(id = com.blackcube.common.R.color.white),
             windowInsets = WindowInsets(0.dp),
-            onDismissRequest = { isSelectedSheetVisible = !isSelectedSheetVisible }
+            onDismissRequest = { isHistorySheetOpen = !isHistorySheetOpen }
         ) {
             state.selectedHistory?.let {
                 SheetContentHistory(
@@ -117,24 +121,31 @@ fun TourRouteScreen(
         sheetContainerColor = colorResource(id = com.blackcube.common.R.color.white),
         sheetPeekHeight = 100.dp,
         sheetContent = {
-            SheetContentHistoriesRoute(
-                onHistoryItemClick = {
-                    isSelectedSheetVisible = !isSelectedSheetVisible
-                    onIntent(TourRouteIntent.OnHistoryItemClick(it.id))
-                },
-                historyRouteModel = HistoryRouteModel(
-                    id = "",
-                    histories = state.histories
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = screenHeight / 2)
+            ) {
+                SheetContentHistoriesRoute(
+                    onHistoryItemClick = {
+                        isHistorySheetOpen = !isHistorySheetOpen
+                        onIntent(TourRouteIntent.OnHistoryItemClick(it.id))
+                    },
+                    historyRouteModel = HistoryRouteModel(
+                        id = "",
+                        histories = state.histories
+                    )
                 )
-            )
+            }
         }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             YandexMapScreen(
                 points = state.mapPoints,
-                isDarkMode = isSystemInDarkTheme()
+                isDarkMode = isSystemInDarkTheme(),
+                currentLocation = state.currentLocation
             ) {
-                isSelectedSheetVisible = !isSelectedSheetVisible
+                isHistorySheetOpen = !isHistorySheetOpen
                 onIntent(TourRouteIntent.OnHistoryItemClick(it.id))
             }
             Box(
@@ -142,8 +153,19 @@ fun TourRouteScreen(
                     .fillMaxSize()
                     .padding(top = 42.dp, start = 12.dp, end = 12.dp)
             ) {
-                MapBackButton(modifier = Modifier.align(Alignment.TopStart)) {
+                MapControlButton(
+                    modifier = Modifier.align(Alignment.TopStart),
+                    icon = Icons.AutoMirrored.Filled.ArrowBack
+                ) {
                     onIntent(TourRouteIntent.OnBackClick)
+                }
+                MapControlButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 120.dp),
+                    icon = Icons.Filled.LocationOn
+                ) {
+                    onIntent(TourRouteIntent.OnCurrentLocationClick)
                 }
                 MapArButton(modifier = Modifier.align(Alignment.TopCenter)) {
                     onIntent(TourRouteIntent.OnArClick)

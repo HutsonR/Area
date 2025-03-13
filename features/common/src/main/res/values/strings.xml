@@ -2,4 +2,6 @@
 <resources>
     <string name="alert_base_title">Ошибка</string>
     <string name="alert_base_description">Произошла непредвиденная ошибка. Попробуйте, пожалуйста, позже</string>
+
+    <string name="understand">Понятно</string>
 </resources>

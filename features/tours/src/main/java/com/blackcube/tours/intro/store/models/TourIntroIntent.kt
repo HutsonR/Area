@@ -9,7 +9,7 @@ sealed interface TourIntroIntent {
 
     data object OnShowMapClick : TourIntroIntent
 
-    data object OnStartTourIntroClick : TourIntroIntent
+    data object OnStartTourClick : TourIntroIntent
 
     data object OnBackClick: TourIntroIntent
 
