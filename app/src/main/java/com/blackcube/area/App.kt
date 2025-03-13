@@ -9,6 +9,6 @@ class App: Application() {
     override fun onCreate() {
         super.onCreate()
 
-        MapKitFactory.setApiKey("2900c408-49a4-47ad-8437-78227fc91332")
+        MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
     }
 }

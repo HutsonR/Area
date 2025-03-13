@@ -1,9 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
     alias(libs.plugins.hilt)
+}
+
+val mapkitApiKey: String by lazy {
+    val properties = Properties().apply {
+        rootProject.file("local.properties").inputStream().use { load(it) }
+    }
+    properties.getProperty("MAPKIT_API_KEY", "")
 }
 
 android {
@@ -21,12 +30,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "MAPKIT_API_KEY", mapkitApiKey)
     }
 
     buildTypes {
-//        debug {
-//            buildConfigField("String", "MAPKIT_API_KEY", "\"$apiKey\"")
-//        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -44,6 +52,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
