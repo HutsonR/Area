@@ -1,5 +1,6 @@
 package com.blackcube.tours.common.domain
 
+import android.annotation.SuppressLint
 import android.content.Context
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -15,6 +16,7 @@ class MapUseCase @Inject constructor() {
         return "$BASE_MAP_REQUEST$lat,$lon"
     }
 
+    @SuppressLint("MissingPermission")
     suspend fun getCurrentPoint(context: Context): Point = suspendCancellableCoroutine { cont ->
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, null)

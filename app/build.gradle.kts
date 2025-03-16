@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 val mapkitApiKey: String by lazy {
@@ -69,6 +70,8 @@ dependencies {
     implementation(projects.data)
     implementation(projects.features)
     implementation(projects.testUtils)
+
+    implementation(libs.firebase.firestore)
 
     // Hilt
     implementation(libs.hilt.android)

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -74,9 +73,9 @@ fun MapControlButton(
     Card(
         modifier = modifier
             .size(48.dp)
-            .clip(CircleShape)
+            .clip(RoundedCornerShape(16.dp))
             .clickable { onClick.invoke() },
-        shape = CircleShape,
+        shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(8.dp),
         colors = CardDefaults.cardColors(containerColor = colorResource(com.blackcube.common.R.color.white))
     ) {

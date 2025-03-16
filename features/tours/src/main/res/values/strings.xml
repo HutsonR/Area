@@ -10,5 +10,9 @@
     <string name="history_go_button">Погнали</string>
 
     <string name="history_route_title">Маршрут тура</string>
+    <string name="history_route_start_button">Начать маршрут</string>
     <string name="history_detail_show_map">Показать в картах</string>
+
+    <string name="permission_location_title">Разрешение на доступ к локации</string>
+    <string name="permission_location_message">Для использования этой функции необходимо предоставить доступ к вашей локации.\nПожалуйста, перейдите в настройки приложения и включите разрешение.</string>
 </resources>

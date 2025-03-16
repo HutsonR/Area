@@ -5,13 +5,18 @@ sealed interface TourRouteIntent {
         val historyId: String
     ) : TourRouteIntent
 
-    data object OnBackClick: TourRouteIntent
+    data object SwitchTour : TourRouteIntent
 
-    data object OnCurrentLocationClick: TourRouteIntent
+    data object OnBackClick : TourRouteIntent
+
+    data class OnMoveLocationClick(
+        val lat: Double? = null,
+        val lon: Double? = null
+    ) : TourRouteIntent
 
     data object OnShowMapClick : TourRouteIntent
 
     data object ShowAlert : TourRouteIntent
 
-    data object OnArClick: TourRouteIntent
+    data object OnArClick : TourRouteIntent
 }

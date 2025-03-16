@@ -9,6 +9,7 @@ import com.blackcube.tours.common.models.HistoryModel
 import com.blackcube.tours.route.store.TourRouteEffect
 import com.blackcube.tours.route.store.TourRouteIntent
 import com.blackcube.tours.route.store.TourRouteState
+import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -95,14 +96,26 @@ class TourRouteViewModel @Inject constructor(
 
             TourRouteIntent.OnArClick -> effect(TourRouteEffect.SwitchArMode)
 
-            TourRouteIntent.OnCurrentLocationClick -> setCurrentLocation()
+            is TourRouteIntent.OnMoveLocationClick -> setCurrentLocation(
+                tourRouteIntent.lat,
+                tourRouteIntent.lon
+            )
+
+            TourRouteIntent.SwitchTour -> modifyState { copy(isTourStarted = state.value.isTourStarted.not()) }
         }
     }
 
-    private fun setCurrentLocation() {
+    private fun setCurrentLocation(
+        lat: Double?,
+        lon: Double?
+    ) {
         viewModelScope.launch {
             try {
-                val currentLocation = mapUseCase.getCurrentPoint(context = appContext)
+                val currentLocation = if (lat == null || lon == null) {
+                    mapUseCase.getCurrentPoint(context = appContext)
+                } else {
+                    Point(lat, lon)
+                }
                 modifyState { copy(currentLocation = currentLocation) }
             } catch (e: Exception) {
                 e.printStackTrace()

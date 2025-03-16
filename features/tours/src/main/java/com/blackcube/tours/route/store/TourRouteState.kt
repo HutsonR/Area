@@ -10,6 +10,7 @@ data class TourRouteState(
     val isLoading: Boolean = true,
     val selectedHistory: HistoryModel? = null,
     val currentLocation: Point? = null,
+    val isTourStarted: Boolean = false,
     val histories: List<HistoryModel> = emptyList(),
     val mapPoints: List<MapPoint> = emptyList()
 )

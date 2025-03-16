@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -20,13 +21,24 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.RequestPoint
+import com.yandex.mapkit.RequestPointType
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.geometry.SubpolylineHelper
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.TextStyle
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.mapkit.transport.TransportFactory
+import com.yandex.mapkit.transport.masstransit.FitnessOptions
+import com.yandex.mapkit.transport.masstransit.Route
+import com.yandex.mapkit.transport.masstransit.RouteOptions
+import com.yandex.mapkit.transport.masstransit.Session
+import com.yandex.mapkit.transport.masstransit.TimeOptions
+import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
+
 
 private object MapDefaults {
     val RostovOnDon = Point(47.2357, 39.7015)
@@ -59,7 +71,8 @@ data class MapPoint(val id: String, val latitude: Double, val longitude: Double,
 fun YandexMapScreen(
     points: List<MapPoint>,
     isDarkMode: Boolean,
-    currentLocation: Point? = null,
+    moveToLocation: Point? = null,
+    buildRoute: Boolean = false,
     onMarkerClick: (MapPoint) -> Unit
 ) {
     val context = LocalContext.current
@@ -118,6 +131,12 @@ fun YandexMapScreen(
     AndroidView(factory = { mapView }) { mv ->
         mv.mapWindow.map.isNightModeEnabled = isDarkMode
 
+        val mapKit = MapKitFactory.getInstance()
+        mapKit.createUserLocationLayer(mv.mapWindow).apply {
+            isVisible = true
+            isHeadingEnabled = true
+        }
+
         mv.mapWindow.map.poiLimit = 0
 
         mv.mapWindow.map.mapObjects.clear()
@@ -159,13 +178,59 @@ fun YandexMapScreen(
         mv.mapWindow.map.move(CameraPosition(targetPoint, 13f, 340.0f, 30.0f))
     }
 
-    LaunchedEffect(currentLocation) {
-        currentLocation?.let { location ->
+    LaunchedEffect(moveToLocation) {
+        moveToLocation?.let { location ->
             mapView.mapWindow.map.move(
                 CameraPosition(location, 16f, 340.0f, 30.0f),
                 Animation(Animation.Type.SMOOTH, 1.0f),
                 null
             )
+        }
+    }
+
+    fun drawRoute(route: Route) {
+        val mapObjects = mapView.mapWindow.map.mapObjects
+        route.sections.forEach { section ->
+            val polyline = SubpolylineHelper.subpolyline(route.geometry, section.geometry)
+            mapObjects.addPolyline(polyline)
+        }
+    }
+
+    val routeListener = object : Session.RouteListener {
+        override fun onMasstransitRoutes(routes: MutableList<Route>) {
+            Log.e("YandexMap", "Маршрут построен успешно")
+            if (routes.isNotEmpty()) {
+                drawRoute(routes[0])
+            }
+        }
+
+        override fun onMasstransitRoutesError(error: Error) {
+            Log.e("YandexMap", "Ошибка построения маршрута: ${error.javaClass}")
+        }
+    }
+
+    LaunchedEffect(buildRoute) {
+        try {
+            if (buildRoute && points.size >= 2) {
+                val router = TransportFactory.getInstance().createPedestrianRouter()
+                val timeOptions = TimeOptions()
+                val routeOptions = RouteOptions(
+                    FitnessOptions()
+                )
+
+                val requestPoints = points.map { point ->
+                    RequestPoint(
+                        Point(point.latitude, point.longitude),
+                        RequestPointType.WAYPOINT,
+                        null,
+                        null,
+                        null
+                    )
+                }
+                router.requestRoutes(requestPoints, timeOptions, routeOptions, routeListener)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

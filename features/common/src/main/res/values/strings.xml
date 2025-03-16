@@ -3,5 +3,10 @@
     <string name="alert_base_title">Ошибка</string>
     <string name="alert_base_description">Произошла непредвиденная ошибка. Попробуйте, пожалуйста, позже</string>
 
+    <string name="dialog_options_title">Выберите действие</string>
+
     <string name="understand">Понятно</string>
+
+    <string name="open_settings">Открыть настройки</string>
+    <string name="cancel">Отмена</string>
 </resources>

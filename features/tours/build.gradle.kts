@@ -53,4 +53,7 @@ dependencies {
 
     // player
     implementation(libs.exoplayer)
+
+    // ar
+    implementation(libs.ar.core)
 }
