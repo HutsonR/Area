@@ -2,9 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.camera.ar"
+        android:required="true" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".App"
@@ -17,6 +26,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Area"
         tools:targetApi="35">
+        <meta-data
+            android:name="com.google.ar.core"
+            android:value="required" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

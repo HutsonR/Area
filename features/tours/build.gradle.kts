@@ -56,4 +56,6 @@ dependencies {
 
     // ar
     implementation(libs.ar.core)
+    implementation(libs.sceneform)
+
 }

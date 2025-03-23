@@ -128,7 +128,7 @@ fun TourIntroScreen(
 
     if (isAlertVisible) {
         ShowAlertDialog(
-            onButtonClick = {
+            onActionButtonClick = {
                 isAlertVisible = false
             }
         )

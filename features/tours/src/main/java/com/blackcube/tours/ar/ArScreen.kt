@@ -2,8 +2,16 @@
 //
 //import androidx.appcompat.app.AppCompatActivity
 //import androidx.transition.Scene
+//import com.blackcube.tours.R
 //import com.google.ar.core.AugmentedImage
 //import com.google.ar.core.TrackingState
+//import com.google.ar.sceneform.AnchorNode
+//import com.google.ar.sceneform.FrameTime
+//import com.google.ar.sceneform.rendering.ModelRenderable
+//import com.yandex.mapkit.directions.driving.Landmark
+//import com.yandex.mapkit.location.Location
+//import com.yandex.mapkit.mapview.MapView
+//import com.yandex.runtime.image.ImageProvider
 //
 //class ARMapActivity : AppCompatActivity(), Scene.OnUpdateListener {
 //
@@ -24,8 +32,6 @@
 //        arFragment.arSceneView.scene.addOnUpdateListener(this)  // слушатель обновлений сцены
 //
 //        // Инициализация карты
-//        MapKitFactory.setApiKey("ВАШ_API_КЛЮЧ")  // Установка API-ключа Яндекс (можно в Application)
-//        MapKitFactory.initialize(this)
 //        mapView = findViewById(R.id.map_view)
 //        mapView.map.isScrollGesturesEnabled = true
 //

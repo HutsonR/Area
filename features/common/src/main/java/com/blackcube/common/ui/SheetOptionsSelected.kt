@@ -55,7 +55,7 @@ fun SheetOptionsSelected(
                         .padding(vertical = 12.dp, horizontal = 32.dp),
                     text = item.title,
                     color = colorResource(R.color.title_color),
-                    fontSize = 18.sp
+                    fontSize = 16.sp
                 )
             }
             item {

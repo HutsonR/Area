@@ -15,8 +15,8 @@ appcompat = "1.7.0"
 material = "1.12.0"
 jetbrainsKotlinJvm = "1.9.0"
 crypto = "1.1.0-alpha06"
-composeAnimation = "1.6.8"
-androidxNavigation = "2.7.7"
+composeAnimation = "1.7.8"
+androidxNavigation = "2.8.9"
 # Hilt
 hilt = "2.51"
 androidxHiltNavigationCompose = "1.2.0"
@@ -34,6 +34,7 @@ googleGmsGoogleServicesVersion = "4.4.2"
 firebaseFirestoreVersion = "25.1.2"
 # AR
 arCoreVersion = "1.48.0"
+sceneformUxVersion = "1.17.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -84,6 +85,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 
 # AR
 ar-core = { group = "com.google.ar", name = "core", version.ref = "arCoreVersion" }
+sceneform = { group = "com.google.ar.sceneform.ux", name = "sceneform-ux", version.ref = "sceneformUxVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -19,6 +19,7 @@ import androidx.navigation.navArgument
 import com.blackcube.core.extension.defaultPermissionRequestCode
 import com.blackcube.core.navigation.Screens
 import com.blackcube.home.HomeScreenRoot
+import com.blackcube.tours.ar.ArScreen
 import com.blackcube.tours.intro.TourIntroScreenRoot
 import com.blackcube.tours.route.TourRouteScreenRoot
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,6 +67,11 @@ class MainActivity : ComponentActivity() {
                     val itemId = Uri.decode(stackEntry.arguments?.getString("id"))
                     TourRouteScreenRoot(
                         itemId ?: "",
+                        navController = navController
+                    )
+                }
+                composable(Screens.ArScreen.route) {
+                    ArScreen(
                         navController = navController
                     )
                 }

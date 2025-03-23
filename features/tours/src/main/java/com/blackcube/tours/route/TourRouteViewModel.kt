@@ -2,7 +2,9 @@ package com.blackcube.tours.route
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
+import com.blackcube.common.ui.AlertData
 import com.blackcube.core.BaseViewModel
+import com.blackcube.tours.R
 import com.blackcube.tours.common.components.MapPoint
 import com.blackcube.tours.common.domain.MapUseCase
 import com.blackcube.tours.common.models.HistoryModel
@@ -92,7 +94,7 @@ class TourRouteViewModel @Inject constructor(
                 )
             )
 
-            TourRouteIntent.ShowAlert -> effect(TourRouteEffect.ShowAlert)
+            TourRouteIntent.ShowAlert -> effect(TourRouteEffect.ShowAlert())
 
             TourRouteIntent.OnArClick -> effect(TourRouteEffect.SwitchArMode)
 
@@ -101,7 +103,20 @@ class TourRouteViewModel @Inject constructor(
                 tourRouteIntent.lon
             )
 
-            TourRouteIntent.SwitchTour -> modifyState { copy(isTourStarted = state.value.isTourStarted.not()) }
+            TourRouteIntent.StartTour -> modifyState { copy(isTourStarted = true) }
+
+            TourRouteIntent.StopTour -> {
+                effect(
+                    TourRouteEffect.ShowAlert(
+                        AlertData(
+                            title = appContext.getString(R.string.history_route_title_stop_alert_title),
+                            message = appContext.getString(R.string.history_route_title_stop_alert_message),
+                            isCancelable = true,
+                            action = { modifyState { copy(isTourStarted = false) } }
+                        )
+                    )
+                )
+            }
         }
     }
 
@@ -119,7 +134,7 @@ class TourRouteViewModel @Inject constructor(
                 modifyState { copy(currentLocation = currentLocation) }
             } catch (e: Exception) {
                 e.printStackTrace()
-                effect(TourRouteEffect.ShowAlert)
+                effect(TourRouteEffect.ShowAlert())
             }
         }
     }

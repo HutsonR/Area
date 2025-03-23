@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.blackcube.common.ui.AlertData
 import com.blackcube.common.ui.OptionsModel
 import com.blackcube.common.ui.PermissionRationaleModal
 import com.blackcube.common.ui.SheetOptionsSelected
@@ -40,6 +41,7 @@ import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.ui.openAppSettings
 import com.blackcube.common.utils.CollectEffect
 import com.blackcube.core.extension.checkPermission
+import com.blackcube.core.navigation.Screens
 import com.blackcube.tours.R
 import com.blackcube.tours.common.components.SheetContentHistoriesRoute
 import com.blackcube.tours.common.components.SheetContentHistory
@@ -88,6 +90,7 @@ fun TourRouteScreen(
     var isOptionsSheetOpen by rememberSaveable { mutableStateOf(false) }
     var isHistorySheetOpen by rememberSaveable { mutableStateOf(false) }
     var isAlertVisible by remember { mutableStateOf(false) }
+    var alertData by remember { mutableStateOf(AlertData()) }
 
     var tempSaveHistoryId by remember { mutableStateOf("") }
 
@@ -96,6 +99,7 @@ fun TourRouteScreen(
             TourRouteEffect.NavigateToBack -> navController.popBackStack()
 
             is TourRouteEffect.ShowAlert -> {
+                alertData = effect.alertData
                 isAlertVisible = true
             }
 
@@ -104,14 +108,21 @@ fun TourRouteScreen(
                 context = context
             )
 
-            TourRouteEffect.SwitchArMode -> Unit
+            TourRouteEffect.SwitchArMode -> navController.navigate(Screens.ArScreen.route)
         }
     }
 
     if (isAlertVisible) {
         ShowAlertDialog(
-            onButtonClick = {
+            alertData = alertData,
+            onCancelButtonClick = {
                 isAlertVisible = false
+                alertData = AlertData()
+            },
+            onActionButtonClick = {
+                isAlertVisible = false
+                alertData.action?.invoke()
+                alertData = AlertData()
             }
         )
     }
@@ -185,7 +196,7 @@ fun TourRouteScreen(
                             )
                         }
                     },
-                    onStartTourClick = { onIntent(TourRouteIntent.SwitchTour) },
+                    onStartTourClick = { onIntent(TourRouteIntent.StartTour) },
                     onOptionsClick = {
                         tempSaveHistoryId = it.id
                         isOptionsSheetOpen = true
@@ -214,7 +225,7 @@ fun TourRouteScreen(
                         modifier = Modifier.align(Alignment.TopStart),
                         icon = Icons.AutoMirrored.Filled.ArrowBack
                     ) {
-                        onIntent(TourRouteIntent.SwitchTour)
+                        onIntent(TourRouteIntent.StopTour)
                     }
                 } else {
                     MapControlButton(

@@ -5,7 +5,9 @@ sealed interface TourRouteIntent {
         val historyId: String
     ) : TourRouteIntent
 
-    data object SwitchTour : TourRouteIntent
+    data object StartTour : TourRouteIntent
+
+    data object StopTour : TourRouteIntent
 
     data object OnBackClick : TourRouteIntent
 
