@@ -38,6 +38,8 @@ dependencies {
     // AndroidX
     api(libs.androidx.core.ktx)
     api(libs.androidx.appcompat)
+    api(libs.androidx.activity)
+    api(libs.androidx.fragment)
     api(libs.androidx.lifecycle.runtime.ktx)
 
     // compose
@@ -57,7 +59,4 @@ dependencies {
     api(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     api(libs.androidx.hilt.navigation.compose)
-
-    // maps
-    api(libs.maps)
 }

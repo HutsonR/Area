@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.org.jetbrains.kotlin.kapt)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -41,5 +43,19 @@ android {
 
 dependencies {
     implementation(projects.features.common)
-//    implementation(libs.exoplayer)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+
+    // maps
+    implementation(libs.maps)
+
+    // player
+    implementation(libs.exoplayer)
+
+    // ar
+    implementation(libs.ar.core)
+    implementation(libs.sceneform)
+
 }

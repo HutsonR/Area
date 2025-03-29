@@ -15,17 +15,26 @@ appcompat = "1.7.0"
 material = "1.12.0"
 jetbrainsKotlinJvm = "1.9.0"
 crypto = "1.1.0-alpha06"
-composeAnimation = "1.6.8"
-androidxNavigation = "2.7.7"
+composeAnimation = "1.7.8"
+androidxNavigation = "2.8.9"
 # Hilt
 hilt = "2.51"
 androidxHiltNavigationCompose = "1.2.0"
 # Карты
-yandex-map = "4.10.1-lite"
+yandex-map = "4.12.0-full"
 # Coil
 coil = "2.5.0"
 # Player
 exoplayer = "1.5.1"
+# AndroidX
+activity_version = "1.10.1"
+fragment_version = "1.8.6"
+# Firebase
+googleGmsGoogleServicesVersion = "4.4.2"
+firebaseFirestoreVersion = "25.1.2"
+# AR
+arCoreVersion = "1.48.0"
+sceneformUxVersion = "1.17.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +56,8 @@ maps-ktx-std = { module = "com.google.maps.android:maps-ktx", version.ref = "map
 maps-ktx-utils = { module = "com.google.maps.android:maps-utils-ktx", version.ref = "mapsktx" }
 maps-secrets-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "mapsecrets" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-activity = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity_version" }
+androidx-fragment = { group = "androidx.fragment", name = "fragment-compose", version.ref = "fragment_version" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "crypto" }
 
@@ -69,6 +80,13 @@ coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 # Player
 exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "exoplayer" }
 
+# Firebase
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestoreVersion" }
+
+# AR
+ar-core = { group = "com.google.ar", name = "core", version.ref = "arCoreVersion" }
+sceneform = { group = "com.google.ar.sceneform.ux", name = "sceneform-ux", version.ref = "sceneformUxVersion" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -77,3 +95,4 @@ jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrai
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 org-jetbrains-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServicesVersion" }

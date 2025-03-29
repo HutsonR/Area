@@ -1,57 +1,52 @@
 package com.blackcube.home
 
-import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.outlined.Timer
-import androidx.compose.material.icons.rounded.Timer
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
-import coil.request.ErrorResult
 import coil.request.ImageRequest
-import coil.request.SuccessResult
-import com.blackcube.home.R
 import com.blackcube.common.ui.CustomActionButton
 import com.blackcube.common.ui.CustomActionButtonWithIcon
 import com.blackcube.common.ui.SectionTitle
@@ -62,7 +57,6 @@ import com.blackcube.home.store.models.HomeIntent
 import com.blackcube.home.store.models.HomeState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import okhttp3.Dispatcher
 import kotlin.math.roundToInt
 
 @Composable
@@ -95,68 +89,60 @@ fun HomeScreen(
     CollectEffect(effects) { effect ->
         when (effect) {
             is HomeEffect.NavigateToExcursion -> {
-                navController.navigate(Screens.TourScreen.createRoute(effect.id))
+                navController.navigate(Screens.TourIntroScreen.createRoute(effect.id))
             }
         }
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState) // Добавляем скролл
-            .nestedScroll(rememberNestedScrollInteropConnection()) // Вложенный скроллинг
             .background(colorResource(com.blackcube.common.R.color.main_background))
-            .padding(top = 48.dp, bottom = 24.dp)
+            .padding(
+                top = 48.dp,
+                bottom = 24.dp
+            )
     ) {
-        SectionTitle(
-            stringResource(id = R.string.current_quest_title),
-            Modifier.padding(
-                start = 24.dp,
-                end = 24.dp,
-                bottom = 14.dp
+        item {
+            SectionTitle(
+                stringResource(id = R.string.current_quest_title),
+                Modifier.padding(
+                    start = 24.dp,
+                    end = 24.dp,
+                    bottom = 14.dp
+                )
             )
-        )
 
-        CurrentQuestCard(
-            "Тайны старого города",
-            progress = 0.4f
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        MyAdventuresSection()
-
-        SectionTitle(
-            stringResource(id = R.string.tour_title),
-            Modifier.padding(
-                top = 20.dp,
-                start = 24.dp,
-                end = 24.dp,
-                bottom = 14.dp
+            CurrentQuestCard(
+                "Тайны старого города",
+                progress = 0.4f
             )
-        )
 
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Adaptive(160.dp),
-            verticalItemSpacing = 12.dp,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .height(600.dp)
-                .padding(horizontal = 12.dp),
-            content = {
-                itemsIndexed(state.lists, key = { _, item -> item.id }) { _, item ->
-                    ExcursionCard(
-                        onClick = { onIntent(HomeIntent.OnExcursionClick(item.id)) },
-                        imageUrl = item.imageUrl,
-                        title = item.title,
-                        description = item.description,
-                        duration = item.duration,
-                        isAR = item.isAR
-                    )
-                }
-            }
-        )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            MyAdventuresSection()
+
+            SectionTitle(
+                stringResource(id = R.string.tour_title),
+                Modifier.padding(
+                    top = 20.dp,
+                    start = 24.dp,
+                    end = 24.dp,
+                    bottom = 14.dp
+                )
+            )
+        }
+        itemsIndexed(state.lists, key = { _, item -> item.id }) { _, item ->
+            ExcursionCard(
+                onClick = { onIntent(HomeIntent.OnExcursionClick(item.id)) },
+                imageUrl = item.imageUrl,
+                title = item.title,
+                description = item.description,
+                duration = item.duration,
+                isAR = item.isAR
+            )
+        }
+        // todo добавить потом ещё места и события. Горизонтальный скролл, как RussPass
     }
 }
 
@@ -360,10 +346,11 @@ fun ExcursionCard(
     duration: String,
     isAR: Boolean
 ) {
-
     Card(
         modifier = Modifier
-            .width(180.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 6.dp)
+            .clip(RoundedCornerShape(16.dp))
             .clickable { onClick.invoke() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
@@ -392,7 +379,7 @@ fun ExcursionCard(
                 contentDescription = title,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp),
+                    .height(140.dp),
                 contentScale = ContentScale.Crop,
             )
             // Content
@@ -407,7 +394,7 @@ fun ExcursionCard(
                 Text(
                     text = title,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
+                    fontSize = 18.sp,
                     color = colorResource(id = com.blackcube.common.R.color.title_color)
                 )
 
@@ -416,7 +403,7 @@ fun ExcursionCard(
                 Text(
                     text = description,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     color = colorResource(id = com.blackcube.common.R.color.description_color),
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis

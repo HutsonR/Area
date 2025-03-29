@@ -1,19 +1,29 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.google.gms.google.services)
+}
+
+val mapkitApiKey: String by lazy {
+    val properties = Properties().apply {
+        rootProject.file("local.properties").inputStream().use { load(it) }
+    }
+    properties.getProperty("MAPKIT_API_KEY", "")
 }
 
 android {
     namespace = "com.blackcube.area"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.blackcube.area"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -21,12 +31,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "MAPKIT_API_KEY", mapkitApiKey)
     }
 
     buildTypes {
-//        debug {
-//            buildConfigField("String", "MAPKIT_API_KEY", "\"$apiKey\"")
-//        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -44,6 +53,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -61,7 +71,12 @@ dependencies {
     implementation(projects.features)
     implementation(projects.testUtils)
 
+    implementation(libs.firebase.firestore)
+
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    // maps
+    implementation(libs.maps)
 }
