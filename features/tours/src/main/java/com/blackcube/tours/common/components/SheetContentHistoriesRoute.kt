@@ -33,8 +33,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.blackcube.common.ui.CustomActionButton
+import com.blackcube.models.tours.HistoryModel
 import com.blackcube.tours.R
-import com.blackcube.tours.common.models.HistoryModel
 import com.blackcube.tours.common.models.HistoryRouteModel
 
 @Composable
@@ -173,6 +173,7 @@ fun PreviewScreenHistoriesRoute() {
                 HistoryModel(
                     id = "1",
                     title = "История 1",
+                    isCompleted = false,
                     description = "Описание истории djsdjs djsldl djskdjasl ddjd kajsdlj kldlda l 1",
                     lat = 0.0,
                     lon = 0.0

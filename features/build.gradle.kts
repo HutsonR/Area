@@ -38,5 +38,6 @@ dependencies {
 
     api(projects.features.home)
     api(projects.features.profile)
+    api(projects.features.places)
     api(projects.features.tours)
 }

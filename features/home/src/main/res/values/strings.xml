@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="current_quest_title">Текущий квест</string>
+    <string name="empty">Пустовато тут как-то ¯\_(ツ)_/¯</string>
+
+    <string name="screen_tour_title">Все увлекательные экскурсии</string>
     <string name="tour_title">Экскурсии</string>
+    <string name="tour_button">Все экскурсии</string>
+
+    <string name="screen_place_title">Все интересные места</string>
+    <string name="places_title">Интересные места</string>
+    <string name="places_button">Все места</string>
 
     <string name="AR">AR</string>
 

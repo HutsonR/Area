@@ -1,7 +1,11 @@
 package com.blackcube.home.store.models
 
-import com.blackcube.home.models.TourModel
+import com.blackcube.models.places.PlaceModel
+import com.blackcube.models.tours.TourModel
 
 data class HomeState(
-    val lists: List<TourModel> = emptyList()
+    val currentQuest: TourModel? = null,
+    val tourItems: List<TourModel> = emptyList(),
+    val placesItems: List<PlaceModel> = emptyList(),
+    val isLoading: Boolean = false
 )

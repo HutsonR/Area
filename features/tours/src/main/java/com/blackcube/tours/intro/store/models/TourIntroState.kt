@@ -1,17 +1,10 @@
 package com.blackcube.tours.intro.store.models
 
-import com.blackcube.tours.common.models.HistoryModel
+import com.blackcube.models.tours.HistoryModel
+import com.blackcube.models.tours.TourModel
 
 data class TourIntroState(
-    val id: String = "",
-    val imageUrl: String = "",
-    val title: String = "",
-    val description: String = "",
-    val isCompleted: Boolean = false,
-    val duration: String = "",
-    val distance: String = "",
-    val isAR: Boolean = false,
+    val tourModel: TourModel? = null,
     val isLoading: Boolean = true,
-    val selectedHistory: HistoryModel? = null,
-    val histories: List<HistoryModel> = emptyList()
+    val selectedHistory: HistoryModel? = null
 )

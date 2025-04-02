@@ -6,6 +6,9 @@
     <string name="dialog_options_title">Выберите действие</string>
 
     <string name="understand">Понятно</string>
+    <string name="button_update">Обновить</string>
+
+    <string name="show_in_map">Показать в картах</string>
 
     <string name="open_settings">Открыть настройки</string>
     <string name="cancel">Отмена</string>

@@ -1,4 +1,4 @@
-package com.blackcube.tours.common.domain
+package com.blackcube.common.utils.map
 
 import android.annotation.SuppressLint
 import android.content.Context
