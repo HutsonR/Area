@@ -35,6 +35,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,13 +65,15 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.blackcube.common.ui.CustomActionButton
+import com.blackcube.common.ui.GradientLinearProgressIndicator
 import com.blackcube.common.ui.SectionTitle
 import com.blackcube.common.ui.ShowAlertDialog
+import com.blackcube.common.ui.ShowProgressIndicator
 import com.blackcube.common.utils.CollectEffect
+import com.blackcube.common.utils.map.MapUtil.navigateToMap
 import com.blackcube.core.navigation.Screens
 import com.blackcube.tours.R
 import com.blackcube.tours.common.components.SheetContentHistory
-import com.blackcube.tours.common.utils.MapUtil.navigateToMap
 import com.blackcube.tours.intro.store.models.TourIntroEffect
 import com.blackcube.tours.intro.store.models.TourIntroIntent
 import com.blackcube.tours.intro.store.models.TourIntroState
@@ -85,6 +88,10 @@ fun TourIntroScreenRoot(
 ) {
     val state by viewModel.state.collectAsState()
     val effects = viewModel.effect
+
+    LaunchedEffect(tourId) {
+        viewModel.fetchTour(tourId)
+    }
 
     TourIntroScreen(
         navController = navController,
@@ -130,6 +137,7 @@ fun TourIntroScreen(
         ShowAlertDialog(
             onActionButtonClick = {
                 isAlertVisible = false
+                onIntent(TourIntroIntent.OnBackClick)
             }
         )
     }
@@ -154,6 +162,13 @@ fun TourIntroScreen(
         }
     }
 
+    if (state.isLoading) {
+        BackButton(onBackClick = { onIntent(TourIntroIntent.OnBackClick) })
+        ShowProgressIndicator(state.isLoading)
+    }
+
+    val tourModel = state.tourModel ?: return // Показ алерта при null в VM
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -162,27 +177,28 @@ fun TourIntroScreen(
         LazyColumn {
             item {
                 Header(
-                    imageUrl = state.imageUrl,
-                    title = state.title,
-                    description = state.description,
-                    duration = state.duration,
-                    distance = state.distance,
-                    isCompleted = state.isCompleted
+                    imageUrl = tourModel.imageUrl,
+                    title = tourModel.title,
+                    description = tourModel.description,
+                    duration = tourModel.duration,
+                    distance = tourModel.distance,
+                    isCompleted = tourModel.isCompleted
                 )
 
-                ArAvailableBlock(isArAvailable = state.isAR)
-
+                ArAvailableBlock(isArAvailable = tourModel.isAR)
+            }
+            item {
                 SectionTitle(
                     stringResource(id = R.string.history_title),
                     Modifier.padding(
-                        top = if (state.isAR) 20.dp else 0.dp,
+                        top = if (tourModel.isAR) 20.dp else 0.dp,
                         start = 20.dp,
                         end = 24.dp,
                         bottom = 14.dp
                     )
                 )
             }
-            itemsIndexed(state.histories, key = { _, item -> item.id }) { index, item ->
+            itemsIndexed(state.tourModel.histories, key = { _, item -> item.id }) { index, item ->
                 HistoryItem(
                     onClick = {
                         isHistorySheetOpen = !isHistorySheetOpen
@@ -194,12 +210,36 @@ fun TourIntroScreen(
                 )
             }
             item {
+                val tourIsStarted = state.tourModel.isStarted
+                val tourIsCompleted = state.tourModel.isCompleted
+                var buttonTitle = stringResource(id = R.string.history_go_button)
+                var buttonTopPadding = 30.dp
+
+                when {
+                    tourIsStarted && tourIsCompleted -> {
+                        buttonTopPadding = 12.dp
+
+                        Box(modifier = Modifier.padding(start = 20.dp, top = 30.dp, end = 20.dp)) {
+                            GradientLinearProgressIndicator(state.tourModel.progress)
+                        }
+                    }
+
+                    tourIsStarted -> {
+                        buttonTitle = stringResource(id = R.string.history_continue_button)
+                        buttonTopPadding = 12.dp
+
+                        Box(modifier = Modifier.padding(start = 20.dp, top = 30.dp, end = 20.dp)) {
+                            GradientLinearProgressIndicator(state.tourModel.progress)
+                        }
+                    }
+                }
+
                 CustomActionButton(
                     onClick = { onIntent(TourIntroIntent.OnStartTourClick) },
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 30.dp),
+                    modifier = Modifier.padding(start = 20.dp, top = buttonTopPadding, end = 20.dp, bottom = 30.dp),
                     backgroundColor = colorResource(com.blackcube.common.R.color.purple),
                     textColor = Color.White,
-                    text = stringResource(id = R.string.history_go_button)
+                    text = buttonTitle
                 )
             }
         }

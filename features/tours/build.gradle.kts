@@ -43,19 +43,17 @@ android {
 
 dependencies {
     implementation(projects.features.common)
+    implementation(projects.models)
 
     // Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
-
-    // maps
-    implementation(libs.maps)
 
     // player
     implementation(libs.exoplayer)
 
     // ar
     implementation(libs.ar.core)
-    implementation(libs.sceneform)
+//    implementation(libs.sceneform)
 
 }

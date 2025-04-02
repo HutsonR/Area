@@ -1,7 +1,7 @@
 package com.blackcube.tours.route.store
 
+import com.blackcube.models.tours.HistoryModel
 import com.blackcube.tours.common.components.MapPoint
-import com.blackcube.tours.common.models.HistoryModel
 import com.yandex.mapkit.geometry.Point
 
 data class TourRouteState(

@@ -40,6 +40,7 @@ import com.blackcube.common.ui.SheetOptionsSelected
 import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.ui.openAppSettings
 import com.blackcube.common.utils.CollectEffect
+import com.blackcube.common.utils.map.MapUtil.navigateToMap
 import com.blackcube.core.extension.checkPermission
 import com.blackcube.core.navigation.Screens
 import com.blackcube.tours.R
@@ -47,7 +48,6 @@ import com.blackcube.tours.common.components.SheetContentHistoriesRoute
 import com.blackcube.tours.common.components.SheetContentHistory
 import com.blackcube.tours.common.components.YandexMapScreen
 import com.blackcube.tours.common.models.HistoryRouteModel
-import com.blackcube.tours.common.utils.MapUtil.navigateToMap
 import com.blackcube.tours.route.components.MapArButton
 import com.blackcube.tours.route.components.MapControlButton
 import com.blackcube.tours.route.store.TourRouteEffect

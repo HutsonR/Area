@@ -1,6 +1,6 @@
 package com.blackcube.tours.intro.store.models
 
-import com.blackcube.tours.common.models.HistoryModel
+import com.blackcube.models.tours.HistoryModel
 
 sealed interface TourIntroIntent {
     data class OnHistoryItemClick(

@@ -3,11 +3,11 @@ package com.blackcube.tours.route
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.blackcube.common.ui.AlertData
+import com.blackcube.common.utils.map.MapUseCase
 import com.blackcube.core.BaseViewModel
+import com.blackcube.models.tours.HistoryModel
 import com.blackcube.tours.R
 import com.blackcube.tours.common.components.MapPoint
-import com.blackcube.tours.common.domain.MapUseCase
-import com.blackcube.tours.common.models.HistoryModel
 import com.blackcube.tours.route.store.TourRouteEffect
 import com.blackcube.tours.route.store.TourRouteIntent
 import com.blackcube.tours.route.store.TourRouteState
@@ -28,6 +28,7 @@ class TourRouteViewModel @Inject constructor(
             id = "1",
             title = "Какой-то заголовок истории с локацией",
             description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 1",
+            isCompleted = false,
             lat = 47.236384,
             lon = 39.710064
         ),
@@ -35,6 +36,7 @@ class TourRouteViewModel @Inject constructor(
             id = "2",
             title = "Какой-то заголовок истории 2",
             description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 2",
+            isCompleted = false,
             lat = 47.240000,
             lon = 39.715000
         ),
@@ -42,6 +44,7 @@ class TourRouteViewModel @Inject constructor(
             id = "3",
             title = "Какой-то заголовок истории 3",
             description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 3",
+            isCompleted = false,
             lat = 47.232000,
             lon = 39.705000
         ),
@@ -49,6 +52,7 @@ class TourRouteViewModel @Inject constructor(
             id = "4",
             title = "Какой-то заголовок истории 4",
             description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 4",
+            isCompleted = false,
             lat = 47.244000,
             lon = 39.722000
         ),
@@ -56,6 +60,7 @@ class TourRouteViewModel @Inject constructor(
             id = "5",
             title = "Какой-то заголовок истории 5",
             description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 5",
+            isCompleted = false,
             lat = 47.230000,
             lon = 39.707000
         ),
@@ -63,6 +68,7 @@ class TourRouteViewModel @Inject constructor(
             id = "6",
             title = "Какой-то заголовок истории 6",
             description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 6",
+            isCompleted = false,
             lat = 47.238000,
             lon = 39.700000
         )

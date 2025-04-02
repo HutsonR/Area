@@ -20,12 +20,12 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun CustomActionButtonWithIcon(
-    onClick: () -> Unit,
     backgroundColor: Color,
     textColor: Color,
     iconColor: Color,
     text: String,
-    icon: ImageVector
+    icon: ImageVector,
+    onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,

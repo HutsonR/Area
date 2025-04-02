@@ -2,7 +2,6 @@ package com.blackcube.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,9 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -27,6 +27,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,10 +37,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,9 +50,14 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.blackcube.catalog.models.CatalogType
+import com.blackcube.common.ui.AlertData
 import com.blackcube.common.ui.CustomActionButton
 import com.blackcube.common.ui.CustomActionButtonWithIcon
+import com.blackcube.common.ui.GradientLinearProgressIndicator
 import com.blackcube.common.ui.SectionTitle
+import com.blackcube.common.ui.ShowAlertDialog
+import com.blackcube.common.ui.ShowProgressIndicator
 import com.blackcube.common.utils.CollectEffect
 import com.blackcube.core.navigation.Screens
 import com.blackcube.home.store.models.HomeEffect
@@ -57,7 +65,9 @@ import com.blackcube.home.store.models.HomeIntent
 import com.blackcube.home.store.models.HomeState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlin.math.roundToInt
+
+private const val MAX_TOUR_ITEMS = 5
+private const val MAX_PLACES_ITEMS = 5
 
 @Composable
 fun HomeScreenRoot(
@@ -82,16 +92,38 @@ fun HomeScreen(
     effects: Flow<HomeEffect>,
     onIntent: (HomeIntent) -> Unit
 ) {
-    val uriHandler = LocalUriHandler.current
-    val context = LocalContext.current
-    val scrollState = rememberScrollState()
+    var isAlertVisible by remember { mutableStateOf(false) }
 
     CollectEffect(effects) { effect ->
         when (effect) {
-            is HomeEffect.NavigateToExcursion -> {
+            is HomeEffect.NavigateToTourIntro -> {
                 navController.navigate(Screens.TourIntroScreen.createRoute(effect.id))
             }
+
+            is HomeEffect.NavigateToPlaceIntro -> {
+                navController.navigate(Screens.PlaceIntroScreen.createRoute(effect.id))
+            }
+
+            is HomeEffect.NavigateToAllCards -> {
+                navController.navigate(Screens.AllCardsScreen.createRoute(effect.cardType))
+            }
+
+            HomeEffect.ShowAlert -> {
+                isAlertVisible = true
+            }
         }
+    }
+
+    if (isAlertVisible) {
+        ShowAlertDialog(
+            alertData = AlertData(
+                actionButtonTitle = com.blackcube.common.R.string.button_update
+            ),
+            onActionButtonClick = {
+                isAlertVisible = false
+                onIntent(HomeIntent.Reload)
+            }
+        )
     }
 
     LazyColumn(
@@ -104,45 +136,145 @@ fun HomeScreen(
             )
     ) {
         item {
-            SectionTitle(
-                stringResource(id = R.string.current_quest_title),
-                Modifier.padding(
-                    start = 24.dp,
-                    end = 24.dp,
-                    bottom = 14.dp
+            state.currentQuest?.let { quest ->
+                SectionTitle(
+                    text = stringResource(id = R.string.current_quest_title),
+                    modifier = Modifier.padding(
+                        start = 24.dp,
+                        end = 24.dp,
+                        bottom = 14.dp
+                    )
                 )
-            )
 
-            CurrentQuestCard(
-                "Тайны старого города",
-                progress = 0.4f
-            )
+                CurrentQuestCard(
+                    quest.title,
+                    progress = quest.progress
+                ) {
+                    onIntent(HomeIntent.OnContinueTourClick)
+                }
 
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+            MyAdventuresSection {
+                onIntent(HomeIntent.OnSeeStatsClick)
+            }
+        }
+
+        if (state.isLoading) {
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                ShowProgressIndicator(state.isLoading)
+            }
+        }
+
+        if (state.placesItems.isEmpty() && state.tourItems.isEmpty() && !state.isLoading) {
+            item {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 48.dp, horizontal = 24.dp),
+                    text = stringResource(id = R.string.empty),
+                    color = colorResource(com.blackcube.common.R.color.description_color),
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        if (state.tourItems.isNotEmpty()) {
+            item {
+                SectionTitle(
+                    text = stringResource(id = R.string.tour_title),
+                    modifier = Modifier.padding(
+                        top = 20.dp,
+                        start = 24.dp,
+                        end = 24.dp,
+                        bottom = 14.dp
+                    )
+                )
+
+                LazyRow {
+                    itemsIndexed(state.tourItems.take(MAX_TOUR_ITEMS), key = { _, item -> item.id }) { index, item ->
+                        val paddingPair = when (index) {
+                            0 -> 24.dp to 12.dp
+                            state.tourItems.lastIndex -> 0.dp to 24.dp
+                            else -> 0.dp to 12.dp
+                        }
+                        CardItem(
+                            modifier = Modifier.padding(start = paddingPair.first, end = paddingPair.second),
+                            imageUrl = item.imageUrl,
+                            title = item.title,
+                            description = item.description,
+                            duration = item.duration,
+                            isAR = item.isAR,
+                            onClick = { onIntent(HomeIntent.OnTourItemClick(item.id)) }
+                        )
+                    }
+                }
+
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, start = 24.dp, end = 24.dp)) {
+                    CustomActionButtonWithIcon(
+                        backgroundColor = colorResource(com.blackcube.common.R.color.purple),
+                        textColor = colorResource(com.blackcube.common.R.color.white),
+                        iconColor = colorResource(com.blackcube.common.R.color.white),
+                        text = stringResource(id = R.string.tour_button),
+                        icon = Icons.AutoMirrored.Filled.ArrowForward,
+                        onClick = { onIntent(HomeIntent.OnSeeAllCardsClick(CatalogType.TOURS)) }
+                    )
+                }
+            }
+        }
+
+        if (state.placesItems.isNotEmpty()) {
+            item {
+                SectionTitle(
+                    text = stringResource(id = R.string.places_title),
+                    modifier = Modifier.padding(
+                        top = 36.dp,
+                        start = 24.dp,
+                        end = 24.dp,
+                        bottom = 14.dp
+                    )
+                )
+
+                LazyRow {
+                    itemsIndexed(state.placesItems.take(MAX_PLACES_ITEMS), key = { _, item -> item.id }) { index, item ->
+                        val paddingPair = when (index) {
+                            0 -> 24.dp to 12.dp
+                            state.placesItems.lastIndex -> 0.dp to 24.dp
+                            else -> 0.dp to 12.dp
+                        }
+                        CardItem(
+                            modifier = Modifier.padding(start = paddingPair.first, end = paddingPair.second),
+                            onClick = { onIntent(HomeIntent.OnPlaceItemClick(item.id)) },
+                            imageUrl = item.imageUrl,
+                            title = item.title,
+                            description = item.description
+                        )
+                    }
+                }
+
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, start = 24.dp, end = 24.dp)) {
+                    CustomActionButtonWithIcon(
+                        backgroundColor = colorResource(com.blackcube.common.R.color.purple),
+                        textColor = colorResource(com.blackcube.common.R.color.white),
+                        iconColor = colorResource(com.blackcube.common.R.color.white),
+                        text = stringResource(id = R.string.places_button),
+                        icon = Icons.AutoMirrored.Filled.ArrowForward,
+                        onClick = { onIntent(HomeIntent.OnSeeAllCardsClick(CatalogType.PLACES)) }
+                    )
+                }
+            }
+        }
+
+        item {
             Spacer(modifier = Modifier.height(20.dp))
-
-            MyAdventuresSection()
-
-            SectionTitle(
-                stringResource(id = R.string.tour_title),
-                Modifier.padding(
-                    top = 20.dp,
-                    start = 24.dp,
-                    end = 24.dp,
-                    bottom = 14.dp
-                )
-            )
         }
-        itemsIndexed(state.lists, key = { _, item -> item.id }) { _, item ->
-            ExcursionCard(
-                onClick = { onIntent(HomeIntent.OnExcursionClick(item.id)) },
-                imageUrl = item.imageUrl,
-                title = item.title,
-                description = item.description,
-                duration = item.duration,
-                isAR = item.isAR
-            )
-        }
-        // todo добавить потом ещё места и события. Горизонтальный скролл, как RussPass
     }
 }
 
@@ -167,11 +299,11 @@ fun PreviewHomeScreen() {
         CurrentQuestCard(
             "Тайны старого города",
             progress = 0.4f
-        )
+        ) {}
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        MyAdventuresSection()
+        MyAdventuresSection({})
 
         SectionTitle(
             stringResource(id = R.string.tour_title),
@@ -194,7 +326,8 @@ fun PreviewSectionTitle() {
 @Composable
 fun CurrentQuestCard(
     text: String,
-    progress: Float
+    progress: Float,
+    onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -212,61 +345,22 @@ fun CurrentQuestCard(
                     color = colorResource(com.blackcube.common.R.color.title_color)
                 )
 
-                GradientLinearProgressIndicator(progress)
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 2.dp, end = 2.dp, bottom = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Box(
+                    modifier = Modifier.padding(vertical = 12.dp)
                 ) {
-                    Text(
-                        text = "${(progress * 100).roundToInt()}%",
-                        fontSize = 12.sp
-                    )
-                    Text(
-                        text = "100%",
-                        fontSize = 12.sp
-                    )
+                    GradientLinearProgressIndicator(progress)
                 }
-
             }
 
             CustomActionButtonWithIcon(
-                onClick = {},
                 backgroundColor = colorResource(com.blackcube.common.R.color.purple),
-                textColor = Color.White,
-                iconColor = Color.White,
+                textColor = colorResource(com.blackcube.common.R.color.white),
+                iconColor = colorResource(com.blackcube.common.R.color.white),
                 text = stringResource(id = R.string.button_continue),
-                icon = Icons.AutoMirrored.Filled.ArrowForward
+                icon = Icons.AutoMirrored.Filled.ArrowForward,
+                onClick = onClick
             )
         }
-    }
-}
-
-@Composable
-fun GradientLinearProgressIndicator(progress: Float) {
-    val gradientBrush = Brush.horizontalGradient(
-        colors = listOf(
-            colorResource(com.blackcube.common.R.color.light_purple),
-            colorResource(com.blackcube.common.R.color.dark_purple)
-        )
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 12.dp, bottom = 4.dp)
-            .height(14.dp)
-            .clip(RoundedCornerShape(7.dp))
-            .background(Color.LightGray.copy(alpha = 0.3f))
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(fraction = progress)
-                .fillMaxHeight()
-                .background(brush = gradientBrush)
-        )
     }
 }
 
@@ -276,11 +370,13 @@ fun CurrentQuestCardPreview() {
     CurrentQuestCard(
         text = "Тайны старого города",
         progress = 0.4f
-    )
+    ) {}
 }
 
 @Composable
-fun MyAdventuresSection() {
+fun MyAdventuresSection(
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -321,7 +417,7 @@ fun MyAdventuresSection() {
                 Spacer(modifier = Modifier.height(18.dp))
 
                 CustomActionButton(
-                    onClick = {},
+                    onClick = onClick,
                     backgroundColor = Color.White,
                     textColor = Color.Black,
                     text = stringResource(id = R.string.button_ofcourse)
@@ -334,34 +430,36 @@ fun MyAdventuresSection() {
 @Preview(showBackground = true)
 @Composable
 fun MyAdventuresSectionPreview() {
-    MyAdventuresSection()
+    MyAdventuresSection({})
 }
 
 @Composable
-fun ExcursionCard(
-    onClick: () -> Unit,
+fun CardItem(
+    modifier: Modifier = Modifier,
     imageUrl: String,
     title: String,
     description: String,
-    duration: String,
-    isAR: Boolean
+    duration: String? = null,
+    isAR: Boolean = false,
+    onClick: () -> Unit
 ) {
+    val height = if (duration != null) 260.dp else 240.dp
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 6.dp)
+        modifier = modifier
+            .width(200.dp)
+            .height(height)
             .clip(RoundedCornerShape(16.dp))
             .clickable { onClick.invoke() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
+            // Изображение
             val context = LocalContext.current
             val placeholder = com.blackcube.common.R.drawable.placeholder
 
             val imageRequest = ImageRequest.Builder(context)
                 .data(imageUrl)
-//                .listener(listener)
                 .dispatcher(Dispatchers.IO)
                 .memoryCacheKey(imageUrl)
                 .diskCacheKey(imageUrl)
@@ -373,29 +471,27 @@ fun ExcursionCard(
                 .crossfade(true)
                 .build()
 
-            // Load and display the image with AsyncImage
             AsyncImage(
                 model = imageRequest,
                 contentDescription = title,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp),
+                    .height(120.dp),
                 contentScale = ContentScale.Crop,
             )
-            // Content
+            // Контент карточки
             Column(
-                modifier = Modifier.padding(
-                    top = 10.dp,
-                    start = 14.dp,
-                    end = 14.dp,
-                    bottom = 14.dp
-                )
+                modifier = Modifier
+                    .padding(top = 10.dp, start = 14.dp, end = 14.dp, bottom = 14.dp)
+                    .fillMaxHeight()
             ) {
                 Text(
                     text = title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = colorResource(id = com.blackcube.common.R.color.title_color)
+                    color = colorResource(id = com.blackcube.common.R.color.title_color),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -405,37 +501,39 @@ fun ExcursionCard(
                     fontWeight = FontWeight.Normal,
                     fontSize = 14.sp,
                     color = colorResource(id = com.blackcube.common.R.color.description_color),
-                    maxLines = 3,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.weight(1f))
 
-                Row (
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Timer,
-                        contentDescription = "Time",
-                        tint = colorResource(id = com.blackcube.common.R.color.description_color),
-                        modifier = Modifier
-                            .padding(end = 2.dp)
-                            .size(14.dp)
-                    )
-                    Text(
-                        text = duration,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 12.sp,
-                        color = colorResource(id = com.blackcube.common.R.color.description_color)
-                    )
-                    if (isAR) {
+                if (duration != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Timer,
+                            contentDescription = "Time",
+                            tint = colorResource(id = com.blackcube.common.R.color.description_color),
+                            modifier = Modifier
+                                .padding(end = 2.dp)
+                                .size(14.dp)
+                        )
                         Text(
-                            text = stringResource(id = R.string.AR),
+                            text = duration,
                             fontWeight = FontWeight.Normal,
                             fontSize = 12.sp,
-                            color = colorResource(id = com.blackcube.common.R.color.purple),
-                            modifier = Modifier.padding(start = 6.dp)
+                            color = colorResource(id = com.blackcube.common.R.color.description_color)
                         )
+                        if (isAR) {
+                            Text(
+                                text = stringResource(id = R.string.AR),
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp,
+                                color = colorResource(id = com.blackcube.common.R.color.purple),
+                                modifier = Modifier.padding(start = 6.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -446,12 +544,23 @@ fun ExcursionCard(
 @Preview(showBackground = true)
 @Composable
 fun ExcursionCardPreview() {
-    ExcursionCard(
+    CardItem(
         onClick = {},
         imageUrl = "https://example.com/image.jpg",
         title = "Тайны старого города",
         description = "Походите по старым закаулкам города в поисках чего-то необычного, может загадочного",
         duration = "40 мин.",
         isAR = true
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PlaceCardPreview() {
+    CardItem(
+        onClick = {},
+        imageUrl = "https://example.com/image.jpg",
+        title = "Тайны старого города",
+        description = "Походите по старым закаулкам города в поисках чего-то необычного, может загадочного"
     )
 }

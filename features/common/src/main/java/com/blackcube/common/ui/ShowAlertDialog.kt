@@ -49,7 +49,7 @@ fun ShowAlertDialog(
                     ),
                     content = {
                         Text(
-                            text = stringResource(id = R.string.cancel),
+                            text = stringResource(id = alertData.secondButtonTitle),
                             modifier = Modifier
                         )
                     }
@@ -69,7 +69,7 @@ fun ShowAlertDialog(
                 ),
                 content = {
                     Text(
-                        text = stringResource(id = R.string.understand),
+                        text = stringResource(id = alertData.actionButtonTitle),
                         modifier = Modifier
                     )
                 }
@@ -89,6 +89,8 @@ fun ShowAlertDialog(
 data class AlertData(
     val title: String = "",
     val message: String = "",
+    val actionButtonTitle: Int = R.string.understand,
+    val secondButtonTitle: Int = R.string.cancel,
     val isCancelable: Boolean = false,
     val action: (() -> Unit)? = null
 )

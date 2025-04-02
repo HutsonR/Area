@@ -43,4 +43,7 @@ dependencies {
     api(projects.core)
     api(projects.testUtils)
     api(libs.coil)
+
+    // maps
+    api(libs.maps)
 }
