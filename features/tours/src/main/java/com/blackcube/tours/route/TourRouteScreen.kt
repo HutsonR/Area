@@ -18,6 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +39,7 @@ import com.blackcube.common.ui.OptionsModel
 import com.blackcube.common.ui.PermissionRationaleModal
 import com.blackcube.common.ui.SheetOptionsSelected
 import com.blackcube.common.ui.ShowAlertDialog
+import com.blackcube.common.ui.ShowProgressIndicator
 import com.blackcube.common.ui.openAppSettings
 import com.blackcube.common.utils.CollectEffect
 import com.blackcube.common.utils.map.MapUtil.navigateToMap
@@ -61,8 +63,13 @@ fun TourRouteScreenRoot(
     navController: NavController,
     viewModel: TourRouteViewModel = hiltViewModel()
 ) {
+    // todo Добавить возможность отмечать точки как посещенные (ОБЯЗАТЕЛЬНО проверка близости к точке)
     val state by viewModel.state.collectAsState()
     val effects = viewModel.effect
+
+    LaunchedEffect(tourId) {
+        viewModel.fetchHistories(tourId)
+    }
 
     TourRouteScreen(
         navController = navController,
@@ -134,12 +141,16 @@ fun TourRouteScreen(
             windowInsets = WindowInsets(0.dp),
             onDismissRequest = { isHistorySheetOpen = !isHistorySheetOpen }
         ) {
-            state.selectedHistory?.let {
+            val selectedHistory = state.selectedHistory
+            if (selectedHistory != null) {
                 SheetContentHistory(
-                    historyModel = it,
+                    historyModel = selectedHistory,
                     onClickShowMap = { onIntent(TourRouteIntent.OnShowMapClick) }
                 )
-            } ?: onIntent(TourRouteIntent.ShowAlert)
+            } else {
+                isHistorySheetOpen = !isHistorySheetOpen
+                onIntent(TourRouteIntent.ShowAlert)
+            }
         }
     }
 
@@ -155,18 +166,31 @@ fun TourRouteScreen(
                     id = "showPlace",
                     value = tempSaveHistoryId,
                     title = "Подробнее о месте"
+                ),
+                OptionsModel(
+                    id = "completePlace",
+                    value = tempSaveHistoryId,
+                    title = "Отметить как посещенное"
                 )
             )
             SheetOptionsSelected(options) { selectedOption ->
                 isOptionsSheetOpen = !isOptionsSheetOpen
                 when (selectedOption.id) {
                     "showPlace" -> {
-                        isHistorySheetOpen = !isHistorySheetOpen
                         onIntent(TourRouteIntent.OnHistoryItemClick(selectedOption.value))
+                        isHistorySheetOpen = !isHistorySheetOpen
+                    }
+                    "completePlace" -> {
+                        onIntent(TourRouteIntent.OnHistoryCompleteClick(selectedOption.value))
                     }
                 }
             }
         }
+    }
+
+    if (state.isLoading) {
+        ShowProgressIndicator(state.isLoading)
+        return
     }
 
     BottomSheetScaffold(

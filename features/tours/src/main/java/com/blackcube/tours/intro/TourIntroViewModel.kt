@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TourIntroViewModel @Inject constructor(
-    // repository: TourRepository,
+    // tourRepository: TourRepository,
     private val mapUseCase: MapUseCase
 ) : BaseViewModel<TourIntroState, TourIntroEffect>(TourIntroState()) {
 
@@ -104,9 +104,8 @@ class TourIntroViewModel @Inject constructor(
     }
 
     private fun onStartTourClick() {
-        // todo в будущем пометить текущий тур, как начатый для отображения на главном экране
         getState().tourModel?.let {
-            modifyState { copy(it.copy(isStarted = true)) }
+            // todo нужно будет обновить старую запись о маршруте по id (TourModel). Отметить начатым
             effect(TourIntroEffect.NavigateToStartTour(it.id))
         } ?: run {
             effect(TourIntroEffect.ShowAlert)

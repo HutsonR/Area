@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -15,7 +16,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -76,7 +76,8 @@ fun YandexMapScreen(
     onMarkerClick: (MapPoint) -> Unit
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    var routePolylines by remember { mutableStateOf<List<com.yandex.mapkit.map.PolylineMapObject>>(emptyList()) }
 
     remember {
         MapKitFactory.initialize(context)
@@ -188,24 +189,43 @@ fun YandexMapScreen(
         }
     }
 
+    // Функция для очистки всех частей маршрута
+    fun clearRoute() {
+        routePolylines.forEach { polyline ->
+            mapView.mapWindow.map.mapObjects.remove(polyline)
+        }
+        routePolylines = emptyList()
+    }
+
+    // Функция для рисования маршрута
     fun drawRoute(route: Route) {
+        clearRoute()
+
         val mapObjects = mapView.mapWindow.map.mapObjects
+        val newPolylines = mutableListOf<com.yandex.mapkit.map.PolylineMapObject>()
+
         route.sections.forEach { section ->
             val polyline = SubpolylineHelper.subpolyline(route.geometry, section.geometry)
-            mapObjects.addPolyline(polyline)
+            val polylineObject = mapObjects.addPolyline(polyline).apply {
+                setStrokeColor(Color.rgb(30, 144, 255))
+            }
+            newPolylines.add(polylineObject)
         }
+
+        routePolylines = newPolylines
     }
 
     val routeListener = object : Session.RouteListener {
         override fun onMasstransitRoutes(routes: MutableList<Route>) {
-            Log.e("YandexMap", "Маршрут построен успешно")
+            Log.d("YandexMap", "Маршрут построен успешно")
             if (routes.isNotEmpty()) {
                 drawRoute(routes[0])
             }
         }
 
         override fun onMasstransitRoutesError(error: Error) {
-            Log.e("YandexMap", "Ошибка построения маршрута: ${error.javaClass}")
+            Toast.makeText(context, "Ошибка построения маршрута", Toast.LENGTH_SHORT).show()
+            Log.d("YandexMap", "Ошибка построения маршрута: ${error.javaClass}")
         }
     }
 
@@ -228,9 +248,12 @@ fun YandexMapScreen(
                     )
                 }
                 router.requestRoutes(requestPoints, timeOptions, routeOptions, routeListener)
+            } else {
+                clearRoute()
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            Toast.makeText(context, "Ошибка построения маршрута", Toast.LENGTH_SHORT).show()
         }
     }
 

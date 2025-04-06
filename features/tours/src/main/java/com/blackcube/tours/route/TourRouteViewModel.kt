@@ -6,6 +6,7 @@ import com.blackcube.common.ui.AlertData
 import com.blackcube.common.utils.map.MapUseCase
 import com.blackcube.core.BaseViewModel
 import com.blackcube.models.tours.HistoryModel
+import com.blackcube.models.tours.TourModel
 import com.blackcube.tours.R
 import com.blackcube.tours.common.components.MapPoint
 import com.blackcube.tours.route.store.TourRouteEffect
@@ -14,11 +15,13 @@ import com.blackcube.tours.route.store.TourRouteState
 import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TourRouteViewModel @Inject constructor(
+    // tourRepository: TourRepository,
     private val mapUseCase: MapUseCase,
     @ApplicationContext private val appContext: Context
 ) : BaseViewModel<TourRouteState, TourRouteEffect>(TourRouteState()) {
@@ -74,20 +77,51 @@ class TourRouteViewModel @Inject constructor(
         )
     )
 
-    init {
-        modifyState {
-            copy(
-                id = "123456",
-                isAR = false,
-                histories = prepareHistories,
-                mapPoints = prepareHistories.toMapPoints()
-            )
+    private val mockTourModel = TourModel(
+        id = "123",
+        imageUrl = "https://i.pinimg.com/originals/29/36/06/2936068fffd819ba4c2abeaf7dd04206.png",
+        title = "Легенды подземелий",
+        description = "Погрузитесь в мрачные подземелья и разгадайте тайны прошлого",
+        isCompleted = false,
+        duration = "1.5 часа",
+        distance = "12 км.",
+        isStarted = true,
+        progress = 0.2F,
+        isAR = true,
+        histories = prepareHistories
+    )
+
+    fun fetchHistories(tourId: String) {
+        viewModelScope.launch {
+            try {
+                modifyState { copy(isLoading = true) }
+                delay(1000) // todo типа получаем (потом заменить на реальное получение)
+                modifyState {
+                    copy(
+                        tourId = tourId,
+                        isAR = mockTourModel.isAR,
+                        histories = mockTourModel.histories,
+                        mapPoints = mockTourModel.histories.toMapPoints()
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                effect(
+                    TourRouteEffect.ShowAlert(
+                        AlertData(action = { effect(TourRouteEffect.NavigateToBack) })
+                    )
+                )
+            } finally {
+                modifyState { copy(isLoading = false) }
+            }
         }
     }
 
     fun handleIntent(tourRouteIntent: TourRouteIntent) {
         when (tourRouteIntent) {
             is TourRouteIntent.OnHistoryItemClick -> setSelectedHistory(tourRouteIntent.historyId)
+
+            is TourRouteIntent.OnHistoryCompleteClick -> onCompleteHistory(tourRouteIntent.historyId)
 
             TourRouteIntent.OnBackClick -> effect(TourRouteEffect.NavigateToBack)
 
@@ -158,5 +192,12 @@ class TourRouteViewModel @Inject constructor(
             longitude = it.lon,
             title = it.title,
         )
+    }
+
+    private fun onCompleteHistory(itemId: String) {
+        viewModelScope.launch {
+            val history = state.value.histories.find { it.id == itemId }
+            // todo проверка на близость к точке и обновление её состояния completed (обновление модели истории)
+        }
     }
 }
