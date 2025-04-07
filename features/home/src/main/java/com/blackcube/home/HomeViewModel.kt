@@ -2,10 +2,12 @@ package com.blackcube.home
 
 import androidx.lifecycle.viewModelScope
 import com.blackcube.core.BaseViewModel
+import com.blackcube.home.models.StartedQuest
 import com.blackcube.home.store.models.HomeEffect
 import com.blackcube.home.store.models.HomeIntent
 import com.blackcube.home.store.models.HomeState
 import com.blackcube.models.places.PlaceModel
+import com.blackcube.models.tours.HistoryModel
 import com.blackcube.models.tours.TourModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -28,7 +30,6 @@ class HomeViewModel @Inject constructor(
             distance = "12 км.",
             isCompleted = false,
             isStarted = false,
-            progress = 0F,
             isAR = true,
             histories = emptyList()
         ),
@@ -41,7 +42,6 @@ class HomeViewModel @Inject constructor(
             distance = "12 км.",
             isCompleted = false,
             isStarted = true,
-            progress = 0.0F,
             isAR = false,
             histories = emptyList()
         ),
@@ -54,9 +54,25 @@ class HomeViewModel @Inject constructor(
             distance = "12 км.",
             isCompleted = false,
             isStarted = true,
-            progress = 0.8F,
             isAR = true,
-            histories = emptyList()
+            histories = listOf(
+                HistoryModel(
+                    id = "5",
+                    title = "Какой-то заголовок истории 5",
+                    description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 5",
+                    isCompleted = true,
+                    lat = 23.997,
+                    lon = 12.000
+                ),
+                HistoryModel(
+                    id = "6",
+                    title = "Какой-то заголовок истории 6",
+                    description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 6",
+                    isCompleted = false,
+                    lat = 24.000,
+                    lon = 12.003
+                )
+            )
         ),
         TourModel(
             id = "4",
@@ -67,7 +83,6 @@ class HomeViewModel @Inject constructor(
             distance = "12 км.",
             isCompleted = false,
             isStarted = false,
-            progress = 0.0F,
             isAR = false,
             histories = emptyList()
         ),
@@ -80,7 +95,6 @@ class HomeViewModel @Inject constructor(
             distance = "12 км.",
             isCompleted = false,
             isStarted = false,
-            progress = 0.0F,
             isAR = true,
             histories = emptyList()
         )
@@ -114,10 +128,21 @@ class HomeViewModel @Inject constructor(
             try {
                 modifyState { copy(isLoading = true) }
                 delay(1000) // todo типа получаем (потом заменить на реальное получение)
-                val foundCurrentQuest = mockTourItems.findLast { it.isStarted }
+                val foundStartedQuest = mockTourItems.findLast { it.isStarted }?.let { quest ->
+                    val progress: Float = run {
+                        val histories = quest.histories.also { if (it.isEmpty()) return@run 0F }
+                        val countCompletedHistories = histories.count { it.isCompleted }
+                        countCompletedHistories.toFloat() / histories.size
+                    }
+
+                    StartedQuest(
+                        tourModel = quest,
+                        progress = progress
+                    )
+                }
                 modifyState {
                     copy(
-                        currentQuest = foundCurrentQuest,
+                        currentStartedQuest = foundStartedQuest,
                         tourItems = mockTourItems,
                         placesItems = mockPlacesItems
                     )
@@ -146,8 +171,8 @@ class HomeViewModel @Inject constructor(
             }
 
             HomeIntent.OnContinueTourClick -> {
-                getState().currentQuest?.let {
-                    effect(HomeEffect.NavigateToTourIntro(it.id))
+                getState().currentStartedQuest?.let {
+                    effect(HomeEffect.NavigateToTourIntro(it.tourModel.id))
                 } ?: effect(HomeEffect.ShowAlert)
             }
 

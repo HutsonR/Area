@@ -206,7 +206,8 @@ fun TourIntroScreen(
                     },
                     number = index + 1,
                     title = item.title,
-                    description = item.description
+                    description = item.description,
+                    isCompleted = item.isCompleted
                 )
             }
             item {
@@ -218,20 +219,16 @@ fun TourIntroScreen(
                 when {
                     tourIsStarted && tourIsCompleted -> {
                         buttonTopPadding = 12.dp
-
-                        Box(modifier = Modifier.padding(start = 20.dp, top = 30.dp, end = 20.dp)) {
-                            GradientLinearProgressIndicator(state.tourModel.progress)
-                        }
                     }
 
                     tourIsStarted -> {
                         buttonTitle = stringResource(id = R.string.history_continue_button)
                         buttonTopPadding = 12.dp
-
-                        Box(modifier = Modifier.padding(start = 20.dp, top = 30.dp, end = 20.dp)) {
-                            GradientLinearProgressIndicator(state.tourModel.progress)
-                        }
                     }
+                }
+
+                Box(modifier = Modifier.padding(start = 20.dp, top = 30.dp, end = 20.dp)) {
+                    GradientLinearProgressIndicator(state.tourProgress)
                 }
 
                 CustomActionButton(
@@ -531,7 +528,8 @@ fun HistoryItem(
     onClick: () -> Unit,
     number: Int,
     title: String,
-    description: String
+    description: String,
+    isCompleted: Boolean
 ) {
     Card(
         modifier = Modifier
@@ -572,6 +570,26 @@ fun HistoryItem(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                if (isCompleted) {
+                    Row(
+                        modifier = Modifier.padding(top = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Outlined.Check,
+                            contentDescription = "Status",
+                            modifier = Modifier.size(14.dp),
+                            tint = colorResource(id = com.blackcube.common.R.color.tour_status_green_text)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(id = R.string.history_status_completed),
+                            fontSize = 12.sp,
+                            color = colorResource(id = com.blackcube.common.R.color.tour_status_green_text)
+                        )
+                    }
+                }
             }
         }
     }
@@ -584,6 +602,7 @@ fun HistoryItemPreview() {
         onClick = {},
         number = 1,
         title = "Какой-то заголовок истории",
-        description = "Описание истории очень очень оооочень длинное, нужно просто создать эффект многоточья"
+        description = "Описание истории очень очень оооочень длинное, нужно просто создать эффект многоточья",
+        isCompleted = true
     )
 }

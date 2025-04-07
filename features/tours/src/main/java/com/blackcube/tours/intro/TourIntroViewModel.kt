@@ -24,7 +24,7 @@ class TourIntroViewModel @Inject constructor(
             id = "1",
             title = "Какой-то заголовок истории с локацией",
             description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 1",
-            isCompleted = false,
+            isCompleted = true,
             lat = 47.236384,
             lon = 39.710064
         ),
@@ -32,7 +32,7 @@ class TourIntroViewModel @Inject constructor(
             id = "2",
             title = "Какой-то заголовок истории 2",
             description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 2",
-            isCompleted = false,
+            isCompleted = true,
             lat = 24.001,
             lon = 12.001
         ),
@@ -79,7 +79,6 @@ class TourIntroViewModel @Inject constructor(
         duration = "1.5 часа",
         distance = "12 км.",
         isStarted = true,
-        progress = 0.2F,
         isAR = true,
         histories = mockHistories
     )
@@ -89,9 +88,15 @@ class TourIntroViewModel @Inject constructor(
             try {
                 modifyState { copy(isLoading = true) }
                 delay(1000) // todo типа получаем (потом заменить на реальное получение)
+                val progress: Float = run {
+                    val histories = mockTourModel.histories.also { if (it.isEmpty()) return@run 0F }
+                    val countCompletedHistories = histories.count { it.isCompleted }
+                    countCompletedHistories.toFloat() / histories.size
+                }
                 modifyState {
                     copy(
                         tourModel = mockTourModel,
+                        tourProgress = progress ?: 0F
                     )
                 }
             } catch (e: Exception) {

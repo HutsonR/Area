@@ -1,6 +1,8 @@
 package com.blackcube.tours.route
 
 import android.content.Context
+import android.location.Location
+import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import com.blackcube.common.ui.AlertData
 import com.blackcube.common.utils.map.MapUseCase
@@ -31,7 +33,7 @@ class TourRouteViewModel @Inject constructor(
             id = "1",
             title = "Какой-то заголовок истории с локацией",
             description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 1",
-            isCompleted = false,
+            isCompleted = true,
             lat = 47.236384,
             lon = 39.710064
         ),
@@ -39,7 +41,7 @@ class TourRouteViewModel @Inject constructor(
             id = "2",
             title = "Какой-то заголовок истории 2",
             description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 2",
-            isCompleted = false,
+            isCompleted = true,
             lat = 47.240000,
             lon = 39.715000
         ),
@@ -86,7 +88,6 @@ class TourRouteViewModel @Inject constructor(
         duration = "1.5 часа",
         distance = "12 км.",
         isStarted = true,
-        progress = 0.2F,
         isAR = true,
         histories = prepareHistories
     )
@@ -101,6 +102,7 @@ class TourRouteViewModel @Inject constructor(
                         tourId = tourId,
                         isAR = mockTourModel.isAR,
                         histories = mockTourModel.histories,
+                        routeProgress = calculateTourProgress(mockTourModel.histories),
                         mapPoints = mockTourModel.histories.toMapPoints()
                     )
                 }
@@ -149,8 +151,8 @@ class TourRouteViewModel @Inject constructor(
                 effect(
                     TourRouteEffect.ShowAlert(
                         AlertData(
-                            title = appContext.getString(R.string.history_route_title_stop_alert_title),
-                            message = appContext.getString(R.string.history_route_title_stop_alert_message),
+                            title = R.string.history_route_title_stop_alert_title,
+                            message = R.string.history_route_title_stop_alert_message,
                             isCancelable = true,
                             action = { modifyState { copy(isTourStarted = false) } }
                         )
@@ -196,8 +198,94 @@ class TourRouteViewModel @Inject constructor(
 
     private fun onCompleteHistory(itemId: String) {
         viewModelScope.launch {
-            val history = state.value.histories.find { it.id == itemId }
-            // todo проверка на близость к точке и обновление её состояния completed (обновление модели истории)
+            val foundHistory = state.value.histories.find { it.id == itemId }
+                ?: return@launch effect(TourRouteEffect.ShowAlert())
+
+            val currentPos = mapUseCase.getCurrentPoint(context = appContext)
+
+            val distanceArray = FloatArray(1)
+            Location.distanceBetween(
+                currentPos.latitude,
+                currentPos.longitude,
+                foundHistory.lat,
+                foundHistory.lon,
+                distanceArray
+            )
+            val distance = distanceArray[0]
+
+            when {
+                !getState().isTourStarted -> {
+                    effect(
+                        TourRouteEffect.ShowAlert(
+                            AlertData(
+                                title = R.string.history_route_location_wrong_startTour_alert_title,
+                                message = R.string.history_route_location_wrong_startTour_alert_message
+                            )
+                        )
+                    )
+                }
+
+                foundHistory.isCompleted -> {
+                    effect(
+                        TourRouteEffect.ShowAlert(
+                            AlertData(
+                                title = R.string.history_route_location_success_alert_title,
+                                message = R.string.history_route_location_success_alert_message,
+                                actionButtonTitle = R.string.history_route_location_success_alert_button
+                            )
+                        )
+                    )
+                }
+
+                distance.toInt() > DISTANCE_THRESHOLD -> {
+                    effect(
+                        TourRouteEffect.ShowAlert(
+                            AlertData(
+                                title = R.string.history_route_location_wrong_location_alert_title,
+                                messageString = appContext.getString(
+                                    R.string.history_route_location_wrong_location_alert_message,
+                                    distance.toInt().toString()
+                                )
+                            )
+                        )
+                    )
+                }
+
+                else -> {
+                    // todo сохранять на сервак
+                    val newHistories = getState().histories.map {
+                        if (it.id == foundHistory.id) {
+                            it.copy(isCompleted = true)
+                        } else {
+                            it
+                        }
+                    }
+                    modifyState {
+                        copy(
+                            histories = newHistories,
+                            routeProgress = calculateTourProgress(newHistories)
+                        )
+                    }
+                    Toast.makeText(
+                        appContext,
+                        appContext.getString(R.string.history_route_location_complete),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
+    }
+
+    private fun calculateTourProgress(histories: List<HistoryModel>): Float {
+        return if (histories.isNotEmpty()) {
+            val countCompletedHistories = histories.count { it.isCompleted }
+            countCompletedHistories.toFloat() / histories.size
+        } else {
+            0F
+        }
+    }
+
+    companion object {
+        private const val DISTANCE_THRESHOLD = 100
     }
 }

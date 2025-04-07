@@ -5,6 +5,7 @@ import com.blackcube.models.tours.TourModel
 
 data class TourIntroState(
     val tourModel: TourModel? = null,
+    val tourProgress: Float = 0f,
     val isLoading: Boolean = true,
     val selectedHistory: HistoryModel? = null
 )
