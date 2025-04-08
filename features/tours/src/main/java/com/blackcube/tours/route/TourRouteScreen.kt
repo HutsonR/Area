@@ -63,7 +63,6 @@ fun TourRouteScreenRoot(
     navController: NavController,
     viewModel: TourRouteViewModel = hiltViewModel()
 ) {
-    // todo Добавить возможность отмечать точки как посещенные (ОБЯЗАТЕЛЬНО проверка близости к точке)
     val state by viewModel.state.collectAsState()
     val effects = viewModel.effect
 
