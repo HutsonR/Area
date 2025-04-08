@@ -20,18 +20,19 @@ fun ShowAlertDialog(
     onCancelButtonClick: () -> Unit = {},
     onActionButtonClick: () -> Unit
 ) {
-    val title = alertData.title.ifEmpty { stringResource(id = R.string.alert_base_title) }
-    val description = alertData.message.ifEmpty { stringResource(id = R.string.alert_base_description) }
+    val message = alertData.messageString.ifEmpty {
+        stringResource(id = alertData.message)
+    }
     AlertDialog(
         title = {
             Text(
-                text = title,
+                text = stringResource(id = alertData.title),
                 modifier = Modifier
             )
         },
         text = {
             Text(
-                text = description,
+                text = message,
                 modifier = Modifier
             )
         },
@@ -42,9 +43,9 @@ fun ShowAlertDialog(
                     modifier = Modifier,
                     shape = MaterialTheme.shapes.medium,
                     colors = ButtonColors(
-                        containerColor = colorResource(R.color.main_background),
+                        containerColor = colorResource(R.color.white),
                         contentColor = colorResource(R.color.purple),
-                        disabledContainerColor = colorResource(R.color.main_background),
+                        disabledContainerColor = colorResource(R.color.white),
                         disabledContentColor = colorResource(R.color.purple)
                     ),
                     content = {
@@ -62,9 +63,9 @@ fun ShowAlertDialog(
                 modifier = Modifier,
                 shape = MaterialTheme.shapes.medium,
                 colors = ButtonColors(
-                    containerColor = colorResource(R.color.main_background),
+                    containerColor = colorResource(R.color.white),
                     contentColor = colorResource(R.color.purple),
-                    disabledContainerColor = colorResource(R.color.main_background),
+                    disabledContainerColor = colorResource(R.color.white),
                     disabledContentColor = colorResource(R.color.purple)
                 ),
                 content = {
@@ -76,7 +77,7 @@ fun ShowAlertDialog(
             )
         },
         onDismissRequest = onActionButtonClick,
-        containerColor = colorResource(R.color.main_background),
+        containerColor = colorResource(R.color.white),
         modifier = modifier.testTag("debugTag:InfoDialog"),
         properties = DialogProperties(
             dismissOnBackPress = true,
@@ -87,8 +88,9 @@ fun ShowAlertDialog(
 }
 
 data class AlertData(
-    val title: String = "",
-    val message: String = "",
+    val title: Int = R.string.alert_base_title,
+    val message: Int = R.string.alert_base_description,
+    val messageString: String = "",
     val actionButtonTitle: Int = R.string.understand,
     val secondButtonTitle: Int = R.string.cancel,
     val isCancelable: Boolean = false,

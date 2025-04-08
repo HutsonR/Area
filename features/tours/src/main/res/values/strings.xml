@@ -2,18 +2,27 @@
 <resources>
     <string name="status_not_completed">Не пройдено</string>
     <string name="status_completed">Пройдено</string>
+    <string name="history_status_completed">Посещена</string>
 
     <string name="ar_available">Доступен AR-режим!</string>
     <string name="ar_mode">AR-режим</string>
     <string name="history_title">Истории</string>
 
-    <string name="history_go_button">Посмотреть на карте</string>
+    <string name="history_go_button">Начать</string>
     <string name="history_continue_button">Продолжить</string>
 
     <string name="history_route_title">Маршрут тура</string>
     <string name="history_route_start_button">Начать маршрут</string>
     <string name="history_route_title_stop_alert_title">Вы уверены?</string>
     <string name="history_route_title_stop_alert_message">Маршрут будет сброшен</string>
+    <string name="history_route_location_complete">История отмечена посещённой</string>
+    <string name="history_route_location_wrong_startTour_alert_title">Сначала начните маршрут</string>
+    <string name="history_route_location_wrong_startTour_alert_message">Чтобы отметить историю посещённой, необходимо начать маршрут</string>
+    <string name="history_route_location_wrong_location_alert_title">Вы слишком далеко</string>
+    <string name="history_route_location_wrong_location_alert_message">Расстояние до точки %s м.\nПодойдите, пожалуйста, ближе и попробуйте снова</string>
+    <string name="history_route_location_success_alert_title">История уже посещена</string>
+    <string name="history_route_location_success_alert_message">Так держать! Можете двигаться дальше</string>
+    <string name="history_route_location_success_alert_button">Спасибо</string>
 
     <string name="permission_location_title">Разрешение на доступ к локации</string>
     <string name="permission_location_message">Для использования этой функции необходимо предоставить доступ к вашей локации.\nПожалуйста, перейдите в настройки приложения и включите разрешение.</string>

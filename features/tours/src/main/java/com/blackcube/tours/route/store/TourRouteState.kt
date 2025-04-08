@@ -5,11 +5,12 @@ import com.blackcube.tours.common.components.MapPoint
 import com.yandex.mapkit.geometry.Point
 
 data class TourRouteState(
-    val id: String = "",
+    val tourId: String = "",
     val isAR: Boolean = false,
-    val isLoading: Boolean = true,
+    val isLoading: Boolean = false,
     val selectedHistory: HistoryModel? = null,
     val currentLocation: Point? = null,
+    val routeProgress: Float = 0F,
     val isTourStarted: Boolean = false,
     val histories: List<HistoryModel> = emptyList(),
     val mapPoints: List<MapPoint> = emptyList()

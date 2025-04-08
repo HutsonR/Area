@@ -136,7 +136,7 @@ fun HomeScreen(
             )
     ) {
         item {
-            state.currentQuest?.let { quest ->
+            state.currentStartedQuest?.let { quest ->
                 SectionTitle(
                     text = stringResource(id = R.string.current_quest_title),
                     modifier = Modifier.padding(
@@ -147,7 +147,7 @@ fun HomeScreen(
                 )
 
                 CurrentQuestCard(
-                    quest.title,
+                    quest.tourModel.title,
                     progress = quest.progress
                 ) {
                     onIntent(HomeIntent.OnContinueTourClick)

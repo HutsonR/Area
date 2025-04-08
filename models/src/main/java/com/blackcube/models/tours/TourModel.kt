@@ -12,7 +12,6 @@ package com.blackcube.models.tours
  * @property isCompleted Флаг, указывающий, завершен ли тур
  * @property isStarted Флаг, указывающий, начат ли тур
  * @property isAR Флаг, указывающий, поддерживает ли тур дополненную реальность (AR)
- * @property progress Прогресс выполнения тура в диапазоне от 0.0 до 1.0
  * @property histories Список историй, связанных с туром
  */
 data class TourModel(
@@ -25,6 +24,5 @@ data class TourModel(
     val isCompleted: Boolean,
     val isStarted: Boolean,
     val isAR: Boolean,
-    val progress: Float,
     val histories: List<HistoryModel>
 )
