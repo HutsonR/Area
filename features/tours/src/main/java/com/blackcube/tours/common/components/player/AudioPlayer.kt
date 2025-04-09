@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.twotone.SkipNext
@@ -19,11 +20,18 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,15 +53,23 @@ fun AudioPlayer(
     track: Track,
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
-    val sliderPosition = remember { mutableLongStateOf(0) }
+    val context = LocalContext.current
 
+    // Отдельное состояние для ползунка, которое обновляется автоматически при изменении позиции воспроизведения.
+    var sliderValue by remember { mutableStateOf(0L) }
+    val playbackPosition by viewModel.playbackPosition.collectAsState()
+
+    LaunchedEffect(playbackPosition) {
+        sliderValue = playbackPosition
+    }
+
+    // При изменении трека вызывается setTrack для его установки
     LaunchedEffect(track) {
-        viewModel.setTrack(track)
+        viewModel.setTrack(track, context)
     }
 
     val currentTrack by viewModel.currentTrack.collectAsState()
     val playerState by viewModel.playerState.collectAsState()
-    val playbackPosition by viewModel.playbackPosition.collectAsState()
 
     Row(
         modifier = Modifier
@@ -65,24 +81,23 @@ fun AudioPlayer(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f)
         ) {
             AudioTrackName(trackName = currentTrack.name)
             AudioSliderBar(
-                value = sliderPosition.longValue.toFloat(),
-                onValueChange = { sliderPosition.longValue = it.toLong() },
-                onValueChangeFinished = { viewModel.changePosition(sliderPosition.longValue) },
+                value = sliderValue.toFloat(),
+                onValueChange = { sliderValue = it.toLong() },
+                onValueChangeFinished = { viewModel.changePosition(sliderValue) },
                 songDuration = currentTrack.durationMillis
             )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 2.dp, end = 2.dp),
+                    .padding(horizontal = 2.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = formatTime(playbackPosition.toFloat()),
+                    text = formatTime(sliderValue.toFloat()),
                     fontSize = 14.sp,
                     color = colorResource(id = com.blackcube.common.R.color.title_color)
                 )
@@ -93,10 +108,13 @@ fun AudioPlayer(
                 )
             }
         }
-
         AudioPlayPauseButton(
             state = playerState,
-            onClick = { viewModel.playPause() }
+            onClick = {
+                if (playerState !is PlayerState.Error) {
+                    viewModel.playPause()
+                }
+            }
         )
     }
 }
@@ -108,19 +126,17 @@ fun AudioSliderBar(
     onValueChangeFinished: () -> Unit,
     songDuration: Float
 ) {
-    Column {
-        Slider(
-            value = value,
-            onValueChange = { onValueChange(it) },
-            onValueChangeFinished = { onValueChangeFinished() },
-            valueRange = 0f..songDuration,
-            colors = SliderDefaults.colors(
-                thumbColor = colorResource(id = com.blackcube.common.R.color.progress_gray),
-                activeTrackColor = colorResource(id = com.blackcube.common.R.color.progress_gray),
-                inactiveTrackColor = colorResource(id = com.blackcube.common.R.color.progress_background_gray),
-            )
+    Slider(
+        value = value,
+        onValueChange = { onValueChange(it) },
+        onValueChangeFinished = { onValueChangeFinished() },
+        valueRange = 0f..songDuration,
+        colors = SliderDefaults.colors(
+            thumbColor = colorResource(id = com.blackcube.common.R.color.progress_gray),
+            activeTrackColor = colorResource(id = com.blackcube.common.R.color.progress_gray),
+            inactiveTrackColor = colorResource(id = com.blackcube.common.R.color.progress_background_gray)
         )
-    }
+    )
 }
 
 @Composable
@@ -147,13 +163,14 @@ fun AudioPlayPauseButton(
         CircularProgressIndicator(
             modifier = Modifier
                 .size(32.dp)
-                .padding(9.dp),
+                .padding(4.dp)
         )
     } else {
-        IconButton(onClick = onClick,) {
+        IconButton(onClick = onClick) {
             Icon(
                 imageVector = when (state) {
                     is PlayerState.Playing -> Icons.Default.Pause
+                    is PlayerState.Error -> Icons.Default.ErrorOutline
                     else -> Icons.Default.PlayArrow
                 },
                 contentDescription = "Play/Pause Button",

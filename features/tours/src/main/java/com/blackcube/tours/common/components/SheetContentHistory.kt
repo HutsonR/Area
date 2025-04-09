@@ -75,11 +75,10 @@ fun SheetContentHistory(
             Spacer(modifier = Modifier.height(18.dp))
         }
 
-        val path = "android.resource://" + "com.blackcube.area" + "/" + R.raw.track
         AudioPlayer(
             track = Track(
                 name = historyModel.title,
-                url = path
+                text = historyModel.description
             )
         )
 
