@@ -41,6 +41,7 @@ android {
 
 dependencies {
     api(projects.core)
+    api(projects.data)
     api(projects.testUtils)
     api(libs.coil)
 
