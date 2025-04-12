@@ -3,38 +3,28 @@ package com.blackcube.places
 import androidx.lifecycle.viewModelScope
 import com.blackcube.common.utils.map.MapUseCase
 import com.blackcube.core.BaseViewModel
-import com.blackcube.models.places.PlaceModel
 import com.blackcube.places.store.models.PlaceIntroEffect
 import com.blackcube.places.store.models.PlaceIntroIntent
 import com.blackcube.places.store.models.PlaceIntroState
+import com.blackcube.remote.repository.places.PlaceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PlaceIntroViewModel @Inject constructor(
-    // repository: PlaceRepository
+    private val placeRepository: PlaceRepository,
     private val mapUseCase: MapUseCase
 ) : BaseViewModel<PlaceIntroState, PlaceIntroEffect>(PlaceIntroState()) {
-
-    private val mockPlaceModel = PlaceModel(
-        id = "123",
-        imageUrl = "https://i.pinimg.com/originals/29/36/06/2936068fffd819ba4c2abeaf7dd04206.png",
-        title = "Легенды подземелий",
-        description = "Погрузитесь в мрачные подземелья и разгадайте тайны прошлого",
-        lat = 47.236384,
-        lon = 39.710064
-    )
 
     fun fetchPlace(placeId: String) {
         viewModelScope.launch {
             try {
                 modifyState { copy(isLoading = true) }
-                delay(1000) // todo типа получаем (потом заменить на реальное получение)
+                val place = placeRepository.getPlaceById(placeId)
                 modifyState {
                     copy(
-                        placeModel = mockPlaceModel
+                        placeModel = place
                     )
                 }
             } catch (e: Exception) {

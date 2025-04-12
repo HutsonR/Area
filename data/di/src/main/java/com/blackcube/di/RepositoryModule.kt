@@ -1,5 +1,7 @@
 package com.blackcube.di
 
+import com.blackcube.remote.repository.places.PlaceRepository
+import com.blackcube.remote.repository.places.PlaceRepositoryImpl
 import com.blackcube.remote.repository.tours.TourRepository
 import com.blackcube.remote.repository.tours.TourRepositoryImpl
 import com.blackcube.remote.repository.tts.TtsRepository
@@ -18,5 +20,8 @@ interface RepositoryModule {
 
     @Binds
     fun bindTourRepository(tourRepositoryImpl: TourRepositoryImpl): TourRepository
+
+    @Binds
+    fun bindPlaceRepository(placeRepositoryImpl: PlaceRepositoryImpl): PlaceRepository
 
 }
