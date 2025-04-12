@@ -10,7 +10,7 @@ package com.blackcube.models.tours
  * @property duration Продолжительность тура (например, 1.5 часа)
  * @property distance Дистанция тура (например, 12 км.)
  * @property isCompleted Флаг, указывающий, завершен ли тур
- * @property isStarted Флаг, указывающий, начат ли тур
+ * @property isStarted Флаг, указывающий, был ли начат тур
  * @property isAR Флаг, указывающий, поддерживает ли тур дополненную реальность (AR)
  * @property histories Список историй, связанных с туром
  */

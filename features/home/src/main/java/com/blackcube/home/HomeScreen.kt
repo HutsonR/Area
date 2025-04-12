@@ -60,14 +60,13 @@ import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.ui.ShowProgressIndicator
 import com.blackcube.common.utils.CollectEffect
 import com.blackcube.core.navigation.Screens
+import com.blackcube.home.HomeViewModel.Companion.MAX_PLACES_ITEMS
+import com.blackcube.home.HomeViewModel.Companion.MAX_TOUR_ITEMS
 import com.blackcube.home.store.models.HomeEffect
 import com.blackcube.home.store.models.HomeIntent
 import com.blackcube.home.store.models.HomeState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-
-private const val MAX_TOUR_ITEMS = 5
-private const val MAX_PLACES_ITEMS = 5
 
 @Composable
 fun HomeScreenRoot(

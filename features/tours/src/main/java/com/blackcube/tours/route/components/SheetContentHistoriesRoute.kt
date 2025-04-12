@@ -86,7 +86,7 @@ fun SheetContentHistoriesRoute(
             }
         }
         if (!isTourStarted) {
-            val buttonTitle = if (historyRouteModel.isTourContinue) {
+            val buttonTitle = if (historyRouteModel.isTourStartedBefore) {
                 stringResource(id = R.string.history_continue_button)
             } else {
                 stringResource(id = R.string.history_route_start_button)
@@ -194,7 +194,7 @@ fun PreviewScreenHistoriesRoute() {
         historyRouteModel = HistoryRouteModel(
             id = "1",
             progress = 0.5f,
-            isTourContinue = true,
+            isTourStartedBefore = true,
             histories = listOf(
                 HistoryModel(
                     id = "1",

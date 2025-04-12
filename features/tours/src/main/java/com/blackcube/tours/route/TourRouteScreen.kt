@@ -205,8 +205,8 @@ fun TourRouteScreen(
                     historyRouteModel = HistoryRouteModel(
                         id = "",
                         progress = state.routeProgress,
-                        isTourContinue = false, // todo доделать
-                        histories = state.histories
+                        isTourStartedBefore = state.tourModel?.isStarted ?: false,
+                        histories = state.tourModel?.histories ?: emptyList()
                     ),
                     isTourStarted = state.isTourStarted,
                     onHistoryItemClick = {
@@ -277,8 +277,10 @@ fun TourRouteScreen(
                         )
                     }
                 }
-                MapArButton(modifier = Modifier.align(Alignment.TopCenter)) {
-                    onIntent(TourRouteIntent.OnArClick)
+                if (state.tourModel?.isAR == true) {
+                    MapArButton(modifier = Modifier.align(Alignment.TopCenter)) {
+                        onIntent(TourRouteIntent.OnArClick)
+                    }
                 }
             }
         }
