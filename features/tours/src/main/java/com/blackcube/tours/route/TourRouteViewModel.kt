@@ -8,7 +8,7 @@ import com.blackcube.common.ui.AlertData
 import com.blackcube.common.utils.map.MapUseCase
 import com.blackcube.core.BaseViewModel
 import com.blackcube.models.tours.HistoryModel
-import com.blackcube.models.tours.TourModel
+import com.blackcube.remote.repository.tours.TourRepository
 import com.blackcube.tours.R
 import com.blackcube.tours.common.components.MapPoint
 import com.blackcube.tours.route.store.TourRouteEffect
@@ -17,93 +17,31 @@ import com.blackcube.tours.route.store.TourRouteState
 import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TourRouteViewModel @Inject constructor(
-    // tourRepository: TourRepository,
+    private val tourRepository: TourRepository,
     private val mapUseCase: MapUseCase,
     @ApplicationContext private val appContext: Context
 ) : BaseViewModel<TourRouteState, TourRouteEffect>(TourRouteState()) {
-
-    private val prepareHistories = listOf(
-        HistoryModel(
-            id = "1",
-            title = "Какой-то заголовок истории с локацией",
-            description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 1",
-            isCompleted = true,
-            lat = 47.236384,
-            lon = 39.710064
-        ),
-        HistoryModel(
-            id = "2",
-            title = "Какой-то заголовок истории 2",
-            description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 2",
-            isCompleted = true,
-            lat = 47.240000,
-            lon = 39.715000
-        ),
-        HistoryModel(
-            id = "3",
-            title = "Какой-то заголовок истории 3",
-            description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 3",
-            isCompleted = false,
-            lat = 47.232000,
-            lon = 39.705000
-        ),
-        HistoryModel(
-            id = "4",
-            title = "Какой-то заголовок истории 4",
-            description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 4",
-            isCompleted = false,
-            lat = 47.244000,
-            lon = 39.722000
-        ),
-        HistoryModel(
-            id = "5",
-            title = "Какой-то заголовок истории 5",
-            description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 5",
-            isCompleted = false,
-            lat = 47.230000,
-            lon = 39.707000
-        ),
-        HistoryModel(
-            id = "6",
-            title = "Какой-то заголовок истории 6",
-            description = "Описание истории очень очень ооочень длинное, нужно просто создать эффект многоточья 6",
-            isCompleted = false,
-            lat = 47.238000,
-            lon = 39.700000
-        )
-    )
-
-    private val mockTourModel = TourModel(
-        id = "123",
-        imageUrl = "https://i.pinimg.com/originals/29/36/06/2936068fffd819ba4c2abeaf7dd04206.png",
-        title = "Легенды подземелий",
-        description = "Погрузитесь в мрачные подземелья и разгадайте тайны прошлого",
-        isCompleted = false,
-        duration = "1.5 часа",
-        distance = "12 км.",
-        isStarted = true,
-        isAR = true,
-        histories = prepareHistories
-    )
 
     fun fetchHistories(tourId: String) {
         viewModelScope.launch {
             try {
                 modifyState { copy(isLoading = true) }
-                delay(1000) // todo типа получаем (потом заменить на реальное получение)
+                val tourModel = tourRepository.getTourById(tourId) ?: return@launch effect(
+                    TourRouteEffect.ShowAlert(
+                        AlertData(action = { effect(TourRouteEffect.NavigateToBack) })
+                    )
+                )
+
                 modifyState {
                     copy(
-                        tourId = tourId,
-                        isAR = mockTourModel.isAR,
-                        histories = mockTourModel.histories,
-                        routeProgress = calculateTourProgress(mockTourModel.histories),
-                        mapPoints = mockTourModel.histories.toMapPoints()
+                        tourModel = tourModel,
+                        routeProgress = calculateTourProgress(tourModel.histories),
+                        mapPoints = tourModel.histories.toMapPoints()
                     )
                 }
             } catch (e: Exception) {
@@ -145,7 +83,7 @@ class TourRouteViewModel @Inject constructor(
                 tourRouteIntent.lon
             )
 
-            TourRouteIntent.StartTour -> modifyState { copy(isTourStarted = true) }
+            TourRouteIntent.StartTour -> onTourStarted()
 
             TourRouteIntent.StopTour -> {
                 effect(
@@ -182,23 +120,31 @@ class TourRouteViewModel @Inject constructor(
     }
 
     private fun setSelectedHistory(itemId: String) {
-        state.value.histories.find { it.id == itemId }?.let {
+        state.value.tourModel?.histories?.find { it.id == itemId }?.let {
             modifyState { copy(selectedHistory = it) }
         }
     }
 
-    private fun List<HistoryModel>.toMapPoints() = this.map {
-        MapPoint(
-            id = it.id,
-            latitude = it.lat,
-            longitude = it.lon,
-            title = it.title,
-        )
+    private fun onTourStarted() {
+        viewModelScope.launch {
+            val tourModel = getState().tourModel ?: return@launch effect(TourRouteEffect.ShowAlert())
+            val newTourModel = tourModel.copy(isStarted = true)
+            if (tourModel.isStarted.not()) {
+                tourRepository.updateTour(newTourModel.id, newTourModel)
+            }
+
+            modifyState {
+                copy(
+                    tourModel = newTourModel,
+                    isTourStarted = true
+                )
+            }
+        }
     }
 
     private fun onCompleteHistory(itemId: String) {
         viewModelScope.launch {
-            val foundHistory = state.value.histories.find { it.id == itemId }
+            val foundHistory = state.value.tourModel?.histories?.find { it.id == itemId }
                 ?: return@launch effect(TourRouteEffect.ShowAlert())
 
             val currentPos = mapUseCase.getCurrentPoint(context = appContext)
@@ -252,18 +198,23 @@ class TourRouteViewModel @Inject constructor(
                 }
 
                 else -> {
-                    // todo сохранять на сервак
-                    val newHistories = getState().histories.map {
+                    val newHistories = getState().tourModel?.histories?.map {
                         if (it.id == foundHistory.id) {
                             it.copy(isCompleted = true)
                         } else {
                             it
                         }
-                    }
+                    } ?: return@launch effect(TourRouteEffect.ShowAlert())
+
+                    val newTourModel = getState().tourModel?.copy(
+                        histories = newHistories
+                    ) ?: return@launch effect(TourRouteEffect.ShowAlert())
+
+                    tourRepository.updateTour(newTourModel.id, newTourModel)
                     modifyState {
                         copy(
-                            histories = newHistories,
-                            routeProgress = calculateTourProgress(newHistories)
+                            tourModel = newTourModel,
+                            routeProgress = calculateTourProgress(newTourModel.histories)
                         )
                     }
                     Toast.makeText(
@@ -283,6 +234,15 @@ class TourRouteViewModel @Inject constructor(
         } else {
             0F
         }
+    }
+
+    private fun List<HistoryModel>.toMapPoints() = this.map {
+        MapPoint(
+            id = it.id,
+            latitude = it.lat,
+            longitude = it.lon,
+            title = it.title,
+        )
     }
 
     companion object {

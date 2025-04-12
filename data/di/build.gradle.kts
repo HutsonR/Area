@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.blackcube.local"
+    namespace = "com.blackcube.di"
     compileSdk = 34
 
     defaultConfig {
@@ -35,7 +35,15 @@ android {
 }
 
 dependencies {
+    implementation(projects.data.remote)
+    implementation(projects.data.local)
+
     // hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    // network
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.converter.json)
 }

@@ -5,6 +5,6 @@ import com.blackcube.models.tours.HistoryModel
 data class HistoryRouteModel(
     val id: String,
     val progress: Float,
-    val isTourContinue: Boolean,
+    val isTourStartedBefore: Boolean,
     val histories: List<HistoryModel>
 )
