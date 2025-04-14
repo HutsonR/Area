@@ -15,6 +15,7 @@
     <string name="history_route_start_button">Начать маршрут</string>
     <string name="history_route_title_stop_alert_title">Вы уверены?</string>
     <string name="history_route_title_stop_alert_message">Маршрут будет сброшен</string>
+    <string name="history_route_complete">Экскурсия пройдена!</string>
     <string name="history_route_location_complete">История отмечена посещённой</string>
     <string name="history_route_location_wrong_startTour_alert_title">Сначала начните маршрут</string>
     <string name="history_route_location_wrong_startTour_alert_message">Чтобы отметить историю посещённой, необходимо начать маршрут</string>

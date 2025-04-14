@@ -44,7 +44,13 @@ private object MapDefaults {
     val RostovOnDon = Point(47.2357, 39.7015)
 }
 
-data class MapPoint(val id: String, val latitude: Double, val longitude: Double, val title: String)
+data class MapPoint(
+    val id: String,
+    val latitude: Double,
+    val longitude: Double,
+    val title: String,
+    val ordinal: Int
+)
 
 /**
  * A composable function that displays a Yandex Map with markers.
@@ -77,7 +83,11 @@ fun YandexMapScreen(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-    var routePolylines by remember { mutableStateOf<List<com.yandex.mapkit.map.PolylineMapObject>>(emptyList()) }
+    var routePolylines by remember {
+        mutableStateOf<List<com.yandex.mapkit.map.PolylineMapObject>>(
+            emptyList()
+        )
+    }
 
     remember {
         MapKitFactory.initialize(context)
@@ -157,8 +167,8 @@ fun YandexMapScreen(
 
         // Добавляем метки на карту
         val mapObjects = mv.mapWindow.map.mapObjects
-        points.forEachIndexed { index, point ->
-            val markerBitmap = createNumberedMarkerBitmap(context, number = index + 1)
+        points.forEachIndexed { _, point ->
+            val markerBitmap = createNumberedMarkerBitmap(context, number = point.ordinal)
             val imageProvider = ImageProvider.fromBitmap(markerBitmap)
             val placemark = mapObjects.addPlacemark(Point(point.latitude, point.longitude), imageProvider)
             placemark.userData = point

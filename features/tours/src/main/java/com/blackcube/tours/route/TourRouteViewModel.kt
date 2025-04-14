@@ -18,6 +18,9 @@ import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
+import nl.dionsegijn.konfetti.core.Party
+import nl.dionsegijn.konfetti.core.emitter.Emitter
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -86,16 +89,20 @@ class TourRouteViewModel @Inject constructor(
             TourRouteIntent.StartTour -> onTourStarted()
 
             TourRouteIntent.StopTour -> {
-                effect(
-                    TourRouteEffect.ShowAlert(
-                        AlertData(
-                            title = R.string.history_route_title_stop_alert_title,
-                            message = R.string.history_route_title_stop_alert_message,
-                            isCancelable = true,
-                            action = { modifyState { copy(isTourStarted = false) } }
+                if (getState().tourModel?.isCompleted == true) {
+                    effect(TourRouteEffect.NavigateToBack)
+                } else {
+                    effect(
+                        TourRouteEffect.ShowAlert(
+                            AlertData(
+                                title = R.string.history_route_title_stop_alert_title,
+                                message = R.string.history_route_title_stop_alert_message,
+                                isCancelable = true,
+                                action = { modifyState { copy(isTourStarted = false) } }
+                            )
                         )
                     )
-                )
+                }
             }
         }
     }
@@ -206,7 +213,11 @@ class TourRouteViewModel @Inject constructor(
                         }
                     } ?: return@launch effect(TourRouteEffect.ShowAlert())
 
+                    val tourIsCompleted = newHistories.count { it.isCompleted }.let { countCompletedHistories ->
+                        newHistories.size == countCompletedHistories
+                    }
                     val newTourModel = getState().tourModel?.copy(
+                        isCompleted = tourIsCompleted,
                         histories = newHistories
                     ) ?: return@launch effect(TourRouteEffect.ShowAlert())
 
@@ -222,6 +233,17 @@ class TourRouteViewModel @Inject constructor(
                         appContext.getString(R.string.history_route_location_complete),
                         Toast.LENGTH_SHORT
                     ).show()
+
+                    if (tourIsCompleted) {
+                        Toast.makeText(
+                            appContext,
+                            appContext.getString(R.string.history_route_complete),
+                            Toast.LENGTH_LONG
+                        ).show()
+                        Party(
+                            emitter = Emitter(duration = 5, TimeUnit.SECONDS).perSecond(30)
+                        )
+                    }
                 }
             }
         }
@@ -242,6 +264,7 @@ class TourRouteViewModel @Inject constructor(
             latitude = it.lat,
             longitude = it.lon,
             title = it.title,
+            ordinal = it.ordinalNumber
         )
     }
 

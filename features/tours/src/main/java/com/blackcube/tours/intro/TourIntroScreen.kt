@@ -198,13 +198,13 @@ fun TourIntroScreen(
                     )
                 )
             }
-            itemsIndexed(state.tourModel.histories, key = { _, item -> item.id }) { index, item ->
+            itemsIndexed(state.tourModel.histories, key = { _, item -> item.id }) { _, item ->
                 HistoryItem(
                     onClick = {
                         isHistorySheetOpen = !isHistorySheetOpen
                         onIntent(TourIntroIntent.OnHistoryItemClick(item))
                     },
-                    number = index + 1,
+                    number = item.ordinalNumber,
                     title = item.title,
                     description = item.description,
                     isCompleted = item.isCompleted

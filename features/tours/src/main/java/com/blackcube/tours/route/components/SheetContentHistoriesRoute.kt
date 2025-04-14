@@ -74,9 +74,9 @@ fun SheetContentHistoriesRoute(
                     }
                 }
             }
-            itemsIndexed(historyRouteModel.histories, key = { _, item -> item.id }) { index, item ->
+            itemsIndexed(historyRouteModel.histories, key = { _, item -> item.id }) { _, item ->
                 HistoryItem(
-                    number = index + 1,
+                    number = item.ordinalNumber,
                     title = item.title,
                     description = item.description,
                     isCompleted = item.isCompleted,
@@ -198,6 +198,7 @@ fun PreviewScreenHistoriesRoute() {
             histories = listOf(
                 HistoryModel(
                     id = "1",
+                    ordinalNumber = 1,
                     title = "История 1",
                     isCompleted = true,
                     description = "Описание истории djsdjs djsldl djskdjasl ddjd kajsdlj kldlda l 1",
