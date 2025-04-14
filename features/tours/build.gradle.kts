@@ -56,4 +56,7 @@ dependencies {
     implementation(libs.ar.core)
 //    implementation(libs.sceneform)
 
+    // konfetti
+    implementation(libs.konfetti)
+
 }
