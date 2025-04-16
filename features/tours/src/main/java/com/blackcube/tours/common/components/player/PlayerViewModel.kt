@@ -8,9 +8,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.blackcube.remote.models.tts.TtsApiModel
 import com.blackcube.remote.repository.tts.TtsRepository
-import com.blackcube.remote.repository.tts.TtsRepositoryImpl.Companion.DEFAULT_TTS_MODEL_ID
 import com.blackcube.tours.common.models.PlayerState
 import com.blackcube.tours.common.models.Track
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -125,12 +123,7 @@ class PlayerViewModel @Inject constructor(
      * @return Абсолютный путь к временно созданному аудиофайлу или null при ошибке.
      */
     private suspend fun getTrackUrl(text: String, context: Context): String? {
-        val audioBytes = ttsRepository.convertTextToSpeech(
-            ttsApiModel = TtsApiModel(
-                text = text,
-                modelId = DEFAULT_TTS_MODEL_ID
-            )
-        )
+        val audioBytes = ttsRepository.convertTextToSpeech(text)
         return audioBytes?.let { bytes ->
             try {
                 val tempFile = File(context.cacheDir, "speech_output.mp3")

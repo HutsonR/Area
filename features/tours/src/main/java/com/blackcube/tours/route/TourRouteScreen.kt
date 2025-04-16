@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.blackcube.common.ui.AlertData
@@ -56,6 +57,10 @@ import com.blackcube.tours.route.store.TourRouteEffect
 import com.blackcube.tours.route.store.TourRouteIntent
 import com.blackcube.tours.route.store.TourRouteState
 import kotlinx.coroutines.flow.Flow
+import nl.dionsegijn.konfetti.compose.KonfettiView
+import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
+import nl.dionsegijn.konfetti.core.Party
+import nl.dionsegijn.konfetti.core.PartySystem
 
 @Composable
 fun TourRouteScreenRoot(
@@ -98,6 +103,9 @@ fun TourRouteScreen(
     var isAlertVisible by remember { mutableStateOf(false) }
     var alertData by remember { mutableStateOf(AlertData()) }
 
+    var isShowConfetti by rememberSaveable { mutableStateOf(false) }
+    var konfettiPartyList by remember { mutableStateOf<List<Party>>(emptyList()) }
+
     var tempSaveHistoryId by remember { mutableStateOf("") }
 
     CollectEffect(effects) { effect ->
@@ -113,6 +121,11 @@ fun TourRouteScreen(
                 request = effect.request,
                 context = context
             )
+
+            is TourRouteEffect.ShowConfetti -> {
+                isShowConfetti = true
+                konfettiPartyList = effect.party
+            }
 
             TourRouteEffect.SwitchArMode -> navController.navigate(Screens.ArScreen.route)
         }
@@ -301,5 +314,20 @@ fun TourRouteScreen(
             showLocationPermissionUI = false
         }
     )
+
+    if (isShowConfetti) {
+        KonfettiView(
+            modifier = Modifier
+                .fillMaxSize()
+                .zIndex(10f),
+            parties = konfettiPartyList,
+            updateListener = object : OnParticleSystemUpdateListener {
+                override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int, ) {
+                    if (activeSystems == 0) isShowConfetti = false
+                }
+            }
+        )
+    }
+
 
 }
