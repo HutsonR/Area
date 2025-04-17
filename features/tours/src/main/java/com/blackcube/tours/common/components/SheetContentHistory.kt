@@ -97,7 +97,7 @@ fun SheetContentHistory(
 
         Text(
             text = historyModel.description,
-            color = colorResource(id = com.blackcube.common.R.color.description_color),
+            color = colorResource(id = com.blackcube.common.R.color.title_color),
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal,
         )

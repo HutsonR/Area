@@ -15,19 +15,19 @@ import javax.inject.Singleton
 class ApiModule {
     @Provides
     @Singleton
-    fun provideTtsApi(@TtsRetrofit retrofit: Retrofit): TtsApi {
+    fun provideTtsApi(retrofit: Retrofit): TtsApi {
         return retrofit.create(TtsApi::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideTourApi(@MainRetrofit retrofit: Retrofit): ToursApi {
+    fun provideTourApi(retrofit: Retrofit): ToursApi {
         return retrofit.create(ToursApi::class.java)
     }
 
     @Provides
     @Singleton
-    fun providePlaceApi(@MainRetrofit retrofit: Retrofit): PlacesApi {
+    fun providePlaceApi(retrofit: Retrofit): PlacesApi {
         return retrofit.create(PlacesApi::class.java)
     }
 }

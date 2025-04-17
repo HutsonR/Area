@@ -1,17 +1,8 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
     alias(libs.plugins.hilt)
-}
-
-val elevenLabsApiKey: String by lazy {
-    val properties = Properties().apply {
-        rootProject.file("local.properties").inputStream().use { load(it) }
-    }
-    properties.getProperty("ELEVENLABS_API_KEY", "")
 }
 
 android {
@@ -23,8 +14,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-
-        buildConfigField("String", "ELEVENLABS_API_KEY", elevenLabsApiKey)
     }
 
     buildTypes {
