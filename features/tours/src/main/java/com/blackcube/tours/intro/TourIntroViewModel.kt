@@ -45,7 +45,6 @@ class TourIntroViewModel @Inject constructor(
 
     private fun onStartTourClick() {
         getState().tourModel?.let {
-            // todo нужно будет обновить старую запись о маршруте по id (TourModel). Отметить начатым
             effect(TourIntroEffect.NavigateToStartTour(it.id))
         } ?: run {
             effect(TourIntroEffect.ShowAlert)

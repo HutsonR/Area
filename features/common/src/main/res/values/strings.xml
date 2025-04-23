@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">UrbanQuest</string>
     <string name="alert_base_title">Ошибка</string>
     <string name="alert_base_description">Произошла непредвиденная ошибка. Попробуйте, пожалуйста, позже</string>
 

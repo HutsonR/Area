@@ -135,10 +135,15 @@ fun HomeScreen(
             )
     ) {
         item {
+            AppName()
+        }
+
+        item {
             state.currentStartedQuest?.let { quest ->
                 SectionTitle(
                     text = stringResource(id = R.string.current_quest_title),
                     modifier = Modifier.padding(
+                        top = 12.dp,
                         start = 24.dp,
                         end = 24.dp,
                         bottom = 14.dp
@@ -154,6 +159,9 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
             }
+        }
+
+        item {
             MyAdventuresSection {
                 onIntent(HomeIntent.OnSeeStatsClick)
             }
@@ -186,7 +194,7 @@ fun HomeScreen(
                 SectionTitle(
                     text = stringResource(id = R.string.tour_title),
                     modifier = Modifier.padding(
-                        top = 20.dp,
+                        top = 26.dp,
                         start = 24.dp,
                         end = 24.dp,
                         bottom = 14.dp
@@ -232,7 +240,7 @@ fun HomeScreen(
                 SectionTitle(
                     text = stringResource(id = R.string.places_title),
                     modifier = Modifier.padding(
-                        top = 36.dp,
+                        top = 26.dp,
                         start = 24.dp,
                         end = 24.dp,
                         bottom = 14.dp
@@ -307,13 +315,27 @@ fun PreviewHomeScreen() {
         SectionTitle(
             stringResource(id = R.string.tour_title),
             Modifier.padding(
-                top = 20.dp,
+                top = 10.dp,
                 start = 24.dp,
                 end = 24.dp,
                 bottom = 14.dp
             )
         )
     }
+}
+
+@Composable
+fun AppName() {
+    Text(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp, bottom = 20.dp),
+        text = stringResource(com.blackcube.common.R.string.app_name),
+        fontSize = 21.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        color = colorResource(com.blackcube.common.R.color.title_color)
+    )
 }
 
 @Preview
