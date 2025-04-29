@@ -34,7 +34,6 @@ android {
 
 dependencies {
     implementation(projects.testUtils)
-    api(projects.data.local)
     api(projects.data.remote)
     implementation(projects.data.di)
 }

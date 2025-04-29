@@ -36,7 +36,6 @@ android {
 
 dependencies {
     implementation(projects.data.remote)
-    implementation(projects.data.local)
 
     // hilt
     implementation(libs.hilt.android)
