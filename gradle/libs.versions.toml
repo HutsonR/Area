@@ -1,5 +1,5 @@
 [versions]
-agp = "8.5.2"
+agp = "8.6.1"
 kotlin = "2.0.21"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -34,6 +34,7 @@ googleGmsGoogleServicesVersion = "4.4.2"
 firebaseFirestoreVersion = "25.1.2"
 # AR
 arCoreVersion = "1.48.0"
+arSceneView = "2.3.0"
 sceneformUxVersion = "1.17.1"
 # Network
 okhttp = "4.12.0"
@@ -90,6 +91,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 
 # AR
 ar-core = { group = "com.google.ar", name = "core", version.ref = "arCoreVersion" }
+ar-sceneview = { group = "io.github.sceneview", name = "arsceneview", version.ref = "arSceneView" }
 sceneform = { group = "com.google.ar.sceneform.ux", name = "sceneform-ux", version.ref = "sceneformUxVersion" }
 
 # Network

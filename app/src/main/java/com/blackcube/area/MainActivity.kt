@@ -1,6 +1,5 @@
 package com.blackcube.area
 
-//import com.blackcube.tours.ar.ArScreen
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle

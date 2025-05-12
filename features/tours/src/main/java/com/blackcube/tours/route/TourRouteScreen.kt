@@ -2,6 +2,7 @@ package com.blackcube.tours.route
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -42,11 +43,11 @@ import com.blackcube.common.ui.SheetOptionsSelected
 import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.ui.ShowProgressIndicator
 import com.blackcube.common.ui.openAppSettings
-import com.blackcube.common.utils.CollectEffect
 import com.blackcube.common.utils.map.MapUtil.navigateToMap
 import com.blackcube.core.extension.checkPermission
-import com.blackcube.core.navigation.Screens
+import com.blackcube.core.util.CollectEffect
 import com.blackcube.tours.R
+import com.blackcube.tours.ar.ArActivity
 import com.blackcube.tours.common.components.SheetContentHistory
 import com.blackcube.tours.common.components.YandexMapScreen
 import com.blackcube.tours.common.models.HistoryRouteModel
@@ -127,7 +128,11 @@ fun TourRouteScreen(
                 konfettiPartyList = effect.party
             }
 
-            TourRouteEffect.SwitchArMode -> navController.navigate(Screens.ArScreen.route)
+            TourRouteEffect.SwitchArMode -> {
+                val intent = Intent(context, ArActivity::class.java)
+                context.startActivity(intent)
+//                navController.navigate(Screens.ArScreen.route)
+            }
         }
     }
 

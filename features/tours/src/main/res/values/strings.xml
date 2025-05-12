@@ -27,4 +27,8 @@
 
     <string name="permission_location_title">Разрешение на доступ к локации</string>
     <string name="permission_location_message">Для использования этой функции необходимо предоставить доступ к вашей локации.\nПожалуйста, перейдите в настройки приложения и включите разрешение.</string>
+
+    <!--  AR  -->
+    <string name="point_your_phone_down">Наведите ваш телефон медленно на пустое место</string>
+    <string name="tap_anywhere_to_add_model">Нажмите где-угодно, чтобы добавить модель</string>
 </resources>
