@@ -60,7 +60,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -71,6 +70,7 @@ import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.ui.ShowProgressIndicator
 import com.blackcube.common.utils.CollectEffect
 import com.blackcube.common.utils.map.MapUtil.navigateToMap
+import com.blackcube.core.navigation.AppNavigationController
 import com.blackcube.core.navigation.Screens
 import com.blackcube.tours.R
 import com.blackcube.tours.common.components.SheetContentHistory
@@ -83,7 +83,7 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun TourIntroScreenRoot(
     tourId: String,
-    navController: NavController,
+    navController: AppNavigationController,
     viewModel: TourIntroViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -104,7 +104,7 @@ fun TourIntroScreenRoot(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TourIntroScreen(
-    navController: NavController,
+    navController: AppNavigationController,
     state: TourIntroState,
     effects: Flow<TourIntroEffect>,
     onIntent: (TourIntroIntent) -> Unit

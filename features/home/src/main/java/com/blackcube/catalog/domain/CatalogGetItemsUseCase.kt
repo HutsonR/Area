@@ -11,15 +11,12 @@ class CatalogGetItemsUseCase @Inject constructor(
     private val placeRepository: PlaceRepository
 ) {
     suspend fun getItems(contentType: CatalogType): List<CatalogItem> {
-        val tours = tourRepository.getTours()
-        val places = placeRepository.getPlaces()
-
         return when (contentType) {
             CatalogType.TOURS -> {
-                tours.mapToTourItems()
+                tourRepository.getTours().mapToTourItems()
             }
             CatalogType.PLACES -> {
-                places.mapToPlaceItems()
+                placeRepository.getPlaces().mapToPlaceItems()
             }
         }
     }

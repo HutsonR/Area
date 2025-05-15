@@ -38,7 +38,9 @@ android {
 }
 
 dependencies {
+    implementation(projects.core)
     implementation(projects.models)
+    implementation(projects.authorization)
 
     // hilt
     implementation(libs.hilt.android)
