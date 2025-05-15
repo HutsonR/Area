@@ -36,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -45,6 +44,7 @@ import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.ui.ShowProgressIndicator
 import com.blackcube.common.utils.CollectEffect
 import com.blackcube.common.utils.map.MapUtil.navigateToMap
+import com.blackcube.core.navigation.AppNavigationController
 import com.blackcube.places.store.models.PlaceIntroEffect
 import com.blackcube.places.store.models.PlaceIntroIntent
 import com.blackcube.places.store.models.PlaceIntroState
@@ -54,7 +54,7 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun PlaceIntroScreenRoot(
     placeId: String,
-    navController: NavController,
+    navController: AppNavigationController,
     viewModel: PlaceIntroViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -74,7 +74,7 @@ fun PlaceIntroScreenRoot(
 
 @Composable
 fun PlaceIntroScreen(
-    navController: NavController,
+    navController: AppNavigationController,
     state: PlaceIntroState,
     effects: Flow<PlaceIntroEffect>,
     onIntent: (PlaceIntroIntent) -> Unit

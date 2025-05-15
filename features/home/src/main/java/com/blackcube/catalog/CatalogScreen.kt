@@ -44,7 +44,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -56,6 +55,7 @@ import com.blackcube.catalog.store.models.CatalogState
 import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.ui.ShowProgressIndicator
 import com.blackcube.common.utils.CollectEffect
+import com.blackcube.core.navigation.AppNavigationController
 import com.blackcube.core.navigation.Screens
 import com.blackcube.home.R
 import kotlinx.coroutines.Dispatchers
@@ -64,7 +64,7 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun CatalogScreenRoot(
     catalogType: String,
-    navController: NavController,
+    navController: AppNavigationController,
     viewModel: CatalogViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -92,7 +92,7 @@ fun CatalogScreenRoot(
 @Composable
 fun CatalogScreen(
     catalogType: CatalogType,
-    navController: NavController,
+    navController: AppNavigationController,
     state: CatalogState,
     effects: Flow<CatalogEffect>,
     onIntent: (CatalogIntent) -> Unit

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,7 +22,8 @@ fun CustomActionButton(
     modifier: Modifier = Modifier,
     backgroundColor: Color,
     textColor: Color,
-    text: String
+    text: String,
+    isActive: Boolean = true
 ) {
     Button(
         onClick = onClick,
@@ -32,19 +32,26 @@ fun CustomActionButton(
             .height(46.dp),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor
-        )
+            containerColor = backgroundColor,
+            disabledContainerColor = backgroundColor.copy(alpha = 0.7f)
+        ),
+        enabled = isActive
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val color = if (isActive) {
+                textColor
+            } else {
+                textColor.copy(alpha = 0.7f)
+            }
             Text(
                 text = text,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = textColor
+                color = color
             )
         }
     }

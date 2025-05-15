@@ -25,6 +25,7 @@ fun CustomActionButtonWithIcon(
     iconColor: Color,
     text: String,
     icon: ImageVector,
+    isActive: Boolean = true,
     onClick: () -> Unit
 ) {
     Button(
@@ -34,19 +35,26 @@ fun CustomActionButtonWithIcon(
             .height(46.dp),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor
-        )
+            containerColor = backgroundColor,
+            disabledContainerColor = backgroundColor.copy(alpha = 0.7f)
+        ),
+        enabled = isActive
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween, // Разместить элементы по краям
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val color = if (isActive) {
+                textColor
+            } else {
+                textColor.copy(alpha = 0.7f)
+            }
             Text(
                 text = text,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = textColor
+                color = color
             )
             Icon(
                 imageVector = icon,

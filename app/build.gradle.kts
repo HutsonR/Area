@@ -69,9 +69,8 @@ dependencies {
     implementation(projects.core)
     implementation(projects.data)
     implementation(projects.features)
+    implementation(projects.authorization)
     implementation(projects.testUtils)
-
-    implementation(libs.firebase.firestore)
 
     // Hilt
     implementation(libs.hilt.android)
