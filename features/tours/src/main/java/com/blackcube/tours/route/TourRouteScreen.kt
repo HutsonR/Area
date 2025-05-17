@@ -42,10 +42,10 @@ import com.blackcube.common.ui.SheetOptionsSelected
 import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.ui.ShowProgressIndicator
 import com.blackcube.common.ui.openAppSettings
+import com.blackcube.common.utils.CollectEffect
 import com.blackcube.common.utils.map.MapUtil.navigateToMap
 import com.blackcube.core.extension.checkPermission
 import com.blackcube.core.navigation.AppNavigationController
-import com.blackcube.core.util.CollectEffect
 import com.blackcube.tours.R
 import com.blackcube.tours.ar.ArActivity
 import com.blackcube.tours.common.components.SheetContentHistory
@@ -131,7 +131,6 @@ fun TourRouteScreen(
             TourRouteEffect.SwitchArMode -> {
                 val intent = Intent(context, ArActivity::class.java)
                 context.startActivity(intent)
-//                navController.navigate(Screens.ArScreen.route)
             }
         }
     }

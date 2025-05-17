@@ -26,6 +26,4 @@ sealed class Screens(val route: String) {
     data object TourRouteScreen : Screens("tourRoute") {
         fun createRoute(id: String) = "tourRoute/${Uri.encode(id)}"
     }
-
-    data object ArScreen : Screens("ar") // todo remove it
 }

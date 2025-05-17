@@ -68,10 +68,10 @@ import com.blackcube.common.ui.GradientLinearProgressIndicator
 import com.blackcube.common.ui.SectionTitle
 import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.ui.ShowProgressIndicator
+import com.blackcube.common.utils.CollectEffect
 import com.blackcube.common.utils.map.MapUtil.navigateToMap
 import com.blackcube.core.navigation.AppNavigationController
 import com.blackcube.core.navigation.Screens
-import com.blackcube.core.util.CollectEffect
 import com.blackcube.tours.R
 import com.blackcube.tours.common.components.SheetContentHistory
 import com.blackcube.tours.intro.store.models.TourIntroEffect

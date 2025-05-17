@@ -148,11 +148,6 @@ class MainActivity : ComponentActivity() {
                     navController = protectedNavController
                 )
             }
-            composable(Screens.ArScreen.route) {
-//                    ArScreen(
-//                        navController = navController
-//                    )
-            }
         }
     }
 
