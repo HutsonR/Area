@@ -35,7 +35,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.blackcube.common.ui.AlertData
 import com.blackcube.common.ui.OptionsModel
 import com.blackcube.common.ui.PermissionRationaleModal
@@ -45,6 +44,7 @@ import com.blackcube.common.ui.ShowProgressIndicator
 import com.blackcube.common.ui.openAppSettings
 import com.blackcube.common.utils.map.MapUtil.navigateToMap
 import com.blackcube.core.extension.checkPermission
+import com.blackcube.core.navigation.AppNavigationController
 import com.blackcube.core.util.CollectEffect
 import com.blackcube.tours.R
 import com.blackcube.tours.ar.ArActivity
@@ -66,7 +66,7 @@ import nl.dionsegijn.konfetti.core.PartySystem
 @Composable
 fun TourRouteScreenRoot(
     tourId: String,
-    navController: NavController,
+    navController: AppNavigationController,
     viewModel: TourRouteViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -87,7 +87,7 @@ fun TourRouteScreenRoot(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TourRouteScreen(
-    navController: NavController,
+    navController: AppNavigationController,
     state: TourRouteState,
     effects: Flow<TourRouteEffect>,
     onIntent: (TourRouteIntent) -> Unit

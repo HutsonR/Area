@@ -3,6 +3,12 @@ package com.blackcube.core.navigation
 import android.net.Uri
 
 sealed class Screens(val route: String) {
+    data object SplashScreen : Screens("splash")
+
+    data object LoginScreen : Screens("login")
+
+    data object RegisterScreen : Screens("register")
+
     data object MainScreen : Screens("home")
 
     data object TourIntroScreen : Screens("tourIntro") {

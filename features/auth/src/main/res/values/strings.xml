@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_title">Авторизация</string>
+    <string name="login_email_label">Почта</string>
+    <string name="login_email_placeholder">Введите почту</string>
+    <string name="login_password_label">Пароль</string>
+    <string name="login_password_placeholder">Введите пароль</string>
+    <string name="login_login_button">Войти</string>
+    <string name="login_register_button">Регистрация</string>
+
+    <string name="register_title">Регистрация</string>
+    <string name="register_email_label">Почта</string>
+    <string name="register_email_placeholder">Введите почту</string>
+    <string name="register_fio_label">Как вас зовут?</string>
+    <string name="register_fio_placeholder">Имя и фамилия</string>
+    <string name="register_password_label">Пароль</string>
+    <string name="register_password_placeholder">Введите пароль</string>
+    <string name="register_register_button">Зарегистрироваться</string>
+
+    <string name="alert_login_message">Возникла ошибка при авторизации. Попробуйте, пожалуйста, позже.</string>
+    <string name="alert_register_message">Возникла ошибка при регистрации. Попробуйте, пожалуйста, позже.</string>
+
+    <string name="error_empty">Поле не должно быть пустым</string>
+    <string name="error_wrong_email">Введите корректный e-mail</string>
+    <string name="error_wrong_name">Имя должно быть не менее 3 букв</string>
+    <string name="error_wrong_password_length">Пароль должен быть не менее 8 символов</string>
+    <string name="error_wrong_password_digit">Нужна хотя бы одна цифра</string>
+    <string name="error_wrong_password_uppercase">Нужна хотя бы одна заглавная буква</string>
+</resources>

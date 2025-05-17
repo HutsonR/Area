@@ -46,7 +46,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -59,6 +58,7 @@ import com.blackcube.common.ui.SectionTitle
 import com.blackcube.common.ui.ShowAlertDialog
 import com.blackcube.common.ui.ShowProgressIndicator
 import com.blackcube.common.utils.CollectEffect
+import com.blackcube.core.navigation.AppNavigationController
 import com.blackcube.core.navigation.Screens
 import com.blackcube.home.HomeViewModel.Companion.MAX_PLACES_ITEMS
 import com.blackcube.home.HomeViewModel.Companion.MAX_TOUR_ITEMS
@@ -70,7 +70,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun HomeScreenRoot(
-    navController: NavController,
+    navController: AppNavigationController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -86,7 +86,7 @@ fun HomeScreenRoot(
 
 @Composable
 fun HomeScreen(
-    navController: NavController,
+    navController: AppNavigationController,
     state: HomeState,
     effects: Flow<HomeEffect>,
     onIntent: (HomeIntent) -> Unit

@@ -7,6 +7,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -16,96 +21,141 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.blackcube.area.navigation.ProtectedNavController
+import com.blackcube.auth.login.LoginScreenRoot
+import com.blackcube.auth.register.RegisterScreenRoot
+import com.blackcube.authorization.api.SessionManager
 import com.blackcube.catalog.CatalogScreenRoot
 import com.blackcube.core.extension.defaultPermissionRequestCode
 import com.blackcube.core.navigation.Screens
 import com.blackcube.home.HomeScreenRoot
 import com.blackcube.places.PlaceIntroScreenRoot
+import com.blackcube.splash.SplashScreenRoot
 import com.blackcube.tours.intro.TourIntroScreenRoot
 import com.blackcube.tours.route.TourRouteScreenRoot
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var sessionManager: SessionManager
+
     private lateinit var navController: NavHostController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Позволяет рисовать контент под статус-баром и нав-баром
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-
-        // Работаем с WindowInsetsControllerCompat
-        val controller = WindowInsetsControllerCompat(window, window.decorView)
-        controller.isAppearanceLightStatusBars =
-            true // светлый статус-бар с тёмными иконками, можно убрать при необходимости
-        controller.isAppearanceLightNavigationBars = true
+        setupWindowDecor()
 
         setContent {
             navController = rememberNavController()
-            NavHost(
-                navController = navController,
-                startDestination = Screens.MainScreen.route
+            val navigator = remember {
+                ProtectedNavController(navController, sessionManager)
+            }
+
+            val isLoggedIn by sessionManager.isLoggedIn.collectAsState(initial = false)
+
+            LaunchedEffect(isLoggedIn) {
+                if (isLoggedIn) {
+                    navController.navigate(Screens.MainScreen.route) {
+                        popUpTo(0)
+                    }
+                } else {
+                    navController.navigate(Screens.LoginScreen.route) {
+                        popUpTo(0)
+                    }
+                }
+            }
+
+            NavigationHost(
+                protectedNavController = navigator
+            )
+        }
+    }
+
+    private fun setupWindowDecor() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        controller.isAppearanceLightStatusBars = true
+        controller.isAppearanceLightNavigationBars = true
+    }
+
+    @Composable
+    private fun NavigationHost(
+        protectedNavController: ProtectedNavController
+    ) {
+        NavHost(
+            navController = navController,
+            startDestination = Screens.SplashScreen.route
+        ) {
+            composable(Screens.SplashScreen.route) {
+                SplashScreenRoot()
+            }
+            composable(Screens.LoginScreen.route) {
+                LoginScreenRoot(
+                    navController = navController
+                )
+            }
+            composable(Screens.RegisterScreen.route) {
+                RegisterScreenRoot(
+                    navController = navController
+                )
+            }
+
+            composable(Screens.MainScreen.route) {
+                HomeScreenRoot(navController = protectedNavController)
+            }
+            composable(
+                route = Screens.TourIntroScreen.route + "/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { stackEntry ->
+                val itemId = Uri.decode(stackEntry.arguments?.getString("id"))
+                TourIntroScreenRoot(
+                    itemId ?: "",
+                    navController = protectedNavController
+                )
+            }
+            composable(
+                route = Screens.PlaceIntroScreen.route + "/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) {
-                composable(Screens.MainScreen.route) {
-                    HomeScreenRoot(navController = navController)
-                }
-
-                composable(
-                    route = Screens.TourIntroScreen.route + "/{id}",
-                    arguments = listOf(navArgument("id") { type = NavType.StringType })
-                ) { stackEntry ->
-                    val itemId = Uri.decode(stackEntry.arguments?.getString("id"))
-                    TourIntroScreenRoot(
-                        itemId ?: "",
-                        navController = navController
-                    )
-                }
-
-                composable(
-                    route = Screens.PlaceIntroScreen.route + "/{id}",
-                    arguments = listOf(navArgument("id") { type = NavType.StringType })
-                ) {
-                    val itemId = Uri.decode(it.arguments?.getString("id"))
-                    PlaceIntroScreenRoot(
-                        itemId ?: "",
-                        navController = navController
-                    )
-                }
-
-                composable(
-                    route = Screens.AllCardsScreen.route + "/{cardType}",
-                    arguments = listOf(navArgument("cardType") { type = NavType.StringType })
-                ) { stackEntry ->
-                    val cardType = Uri.decode(stackEntry.arguments?.getString("cardType"))
-                    CatalogScreenRoot(
-                        cardType ?: "",
-                        navController = navController
-                    )
-                }
-
-                composable(
-                    route = Screens.TourRouteScreen.route + "/{id}",
-                    arguments = listOf(navArgument("id") { type = NavType.StringType })
-                ) { stackEntry ->
-                    val itemId = Uri.decode(stackEntry.arguments?.getString("id"))
-                    TourRouteScreenRoot(
-                        itemId ?: "",
-                        navController = navController
-                    )
-                }
-
-                composable(Screens.ArScreen.route) {
+                val itemId = Uri.decode(it.arguments?.getString("id"))
+                PlaceIntroScreenRoot(
+                    itemId ?: "",
+                    navController = protectedNavController
+                )
+            }
+            composable(
+                route = Screens.AllCardsScreen.route + "/{cardType}",
+                arguments = listOf(navArgument("cardType") { type = NavType.StringType })
+            ) { stackEntry ->
+                val cardType = Uri.decode(stackEntry.arguments?.getString("cardType"))
+                CatalogScreenRoot(
+                    cardType ?: "",
+                    navController = protectedNavController
+                )
+            }
+            composable(
+                route = Screens.TourRouteScreen.route + "/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { stackEntry ->
+                val itemId = Uri.decode(stackEntry.arguments?.getString("id"))
+                TourRouteScreenRoot(
+                    itemId ?: "",
+                    navController = protectedNavController
+                )
+            }
+            composable(Screens.ArScreen.route) {
 //                    ArScreen(
 //                        navController = navController
 //                    )
-                }
             }
         }
     }
 
-    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)} passing\n      in a {@link RequestMultiplePermissions} object for the {@link ActivityResultContract} and\n      handling the result in the {@link ActivityResultCallback#onActivityResult(Object) callback}.")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
