@@ -16,7 +16,7 @@ class AuthUseCaseImpl @Inject constructor(
 
     override suspend fun register(email:String, name:String, password:String): Boolean {
         val token = authRepository.register(email, name, password)
-        return if (token.isNotBlank()) {
+        return if (!token.isNullOrBlank()) {
             sessionManager.setToken(token)
             true
         } else {
@@ -26,7 +26,7 @@ class AuthUseCaseImpl @Inject constructor(
 
     override suspend fun login(email:String, password:String): Boolean {
         val token = authRepository.login(email, password)
-        return if (token.isNotBlank()) {
+        return if (!token.isNullOrBlank()) {
             sessionManager.setToken(token)
             true
         } else {
