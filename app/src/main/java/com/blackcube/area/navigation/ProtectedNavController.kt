@@ -2,7 +2,7 @@ package com.blackcube.area.navigation
 
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
-import com.blackcube.authorization.session.SessionManager
+import com.blackcube.authorization.api.SessionManager
 import com.blackcube.core.navigation.AppNavigationController
 import com.blackcube.core.navigation.Screens
 

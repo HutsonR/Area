@@ -25,7 +25,7 @@ import androidx.navigation.navArgument
 import com.blackcube.area.navigation.ProtectedNavController
 import com.blackcube.auth.login.LoginScreenRoot
 import com.blackcube.auth.register.RegisterScreenRoot
-import com.blackcube.authorization.session.SessionManager
+import com.blackcube.authorization.api.SessionManager
 import com.blackcube.catalog.CatalogScreenRoot
 import com.blackcube.core.extension.defaultPermissionRequestCode
 import com.blackcube.core.navigation.Screens

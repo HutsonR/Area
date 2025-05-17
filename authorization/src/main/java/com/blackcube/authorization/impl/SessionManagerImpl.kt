@@ -1,7 +1,7 @@
 package com.blackcube.authorization.impl
 
-import com.blackcube.authorization.session.SessionManager
-import com.blackcube.authorization.session.TokenStorage
+import com.blackcube.authorization.api.SessionManager
+import com.blackcube.authorization.api.TokenStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

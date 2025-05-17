@@ -22,7 +22,7 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideAuthInterceptor(
-        sessionManager: com.blackcube.authorization.session.SessionManager
+        sessionManager: com.blackcube.authorization.api.SessionManager
     ): Interceptor = Interceptor { chain ->
         val original: Request = chain.request()
         val path = original.url.encodedPath

@@ -1,6 +1,6 @@
 package com.blackcube.auth.domain
 
-import com.blackcube.authorization.session.SessionManager
+import com.blackcube.authorization.api.SessionManager
 import com.blackcube.remote.repository.auth.AuthRepository
 import javax.inject.Inject
 

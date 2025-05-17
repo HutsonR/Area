@@ -1,4 +1,4 @@
-package com.blackcube.authorization.session
+package com.blackcube.authorization.api
 
 /**
  * Низкоуровневое хранилище токена (без логики шифрования/флоу).

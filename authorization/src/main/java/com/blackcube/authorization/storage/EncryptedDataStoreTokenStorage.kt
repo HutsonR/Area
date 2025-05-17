@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.blackcube.authorization.session.TokenStorage
+import com.blackcube.authorization.api.TokenStorage
 import com.blackcube.core.util.encryption.CryptoManager
 import com.blackcube.core.util.encryption.CryptoManager.Companion.CIPHER_IV_SIZE
 import dagger.hilt.android.qualifiers.ApplicationContext
