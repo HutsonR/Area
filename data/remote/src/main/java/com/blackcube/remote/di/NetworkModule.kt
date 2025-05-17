@@ -26,9 +26,13 @@ class NetworkModule {
     ): Interceptor = Interceptor { chain ->
         val original: Request = chain.request()
         val path = original.url.encodedPath
+        val allowedNonAuthPaths = listOf(
+            "/auth/register",
+            "/auth/login",
+            "/encryption/publicKey"
+        )
 
-        // Если это регистрация или логин — пропускаем без токена
-        if (path == "/auth/register" || path == "/auth/login") {
+        if (path in allowedNonAuthPaths) {
             chain.proceed(original)
         } else {
             val token: String? = runBlocking { sessionManager.getToken() }
