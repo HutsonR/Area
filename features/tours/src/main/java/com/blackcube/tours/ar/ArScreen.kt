@@ -1,173 +1,205 @@
-//package com.blackcube.tours.ar
-//
-//import androidx.appcompat.app.AppCompatActivity
-//import androidx.transition.Scene
-//import com.blackcube.tours.R
-//import com.google.ar.core.AugmentedImage
-//import com.google.ar.core.TrackingState
-//import com.google.ar.sceneform.AnchorNode
-//import com.google.ar.sceneform.FrameTime
-//import com.google.ar.sceneform.rendering.ModelRenderable
-//import com.yandex.mapkit.directions.driving.Landmark
-//import com.yandex.mapkit.location.Location
-//import com.yandex.mapkit.mapview.MapView
-//import com.yandex.runtime.image.ImageProvider
-//
-//class ARMapActivity : AppCompatActivity(), Scene.OnUpdateListener {
-//
-//    private lateinit var arFragment: CustomArFragment  // наш AR фрагмент с кастомной конфигурацией
-//    private lateinit var mapView: MapView
-//    private val modelRenderables = mutableMapOf<String, ModelRenderable>()
-//    private val recognizedImages = mutableSetOf<AugmentedImage>()
-//    private val landmarksMap = mutableMapOf<String, Landmark>()
-//    private var currentLocation: Location? = null
-//    private var currentAzimuth: Double? = null
-//
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_armap)  // в разметке должны быть ArFragment и MapView
-//
-//        // Инициализация AR-фрагмента
-//        arFragment = supportFragmentManager.findFragmentById(R.id.ar_fragment) as CustomArFragment
-//        arFragment.arSceneView.scene.addOnUpdateListener(this)  // слушатель обновлений сцены
-//
-//        // Инициализация карты
-//        mapView = findViewById(R.id.map_view)
-//        mapView.map.isScrollGesturesEnabled = true
-//
-//        // Получаем текущую локацию пользователя (используем простое API LocationServices или MapKit)
-//        // Здесь должен быть код для запроса разрешения LOCATION и получения координат.
-//        currentLocation = getLastKnownLocation() // псевдо-функция, замените реальным получением локации
-//        currentAzimuth = getDeviceAzimuth()      // псевдо-функция, замените реализацией компаса
-//
-//        // Центрируем карту на пользователе
-//        currentLocation?.let { loc ->
-//            val userPoint = Point(loc.latitude, loc.longitude)
-//            mapView.map.move(CameraPosition(userPoint, 16.0f, 0.0f, 0.0f))
-//        }
-//
-//        // Загрузка 3D моделей
-//        loadModels()
-//
-//        // Получение данных из Firebase и размещение объектов
-//        currentLocation?.let { loc ->
-//            fetchNearbyLandmarks(loc, radiusMeters = 1000.0)  // например, ищем в радиусе 1 км
-//        }
-//    }
-//
-//    override fun onUpdate(frameTime: FrameTime) {
-//        // Обработка распознавания Augmented Images (например, снежинки)
-//        val frame = arFragment.arSceneView.arFrame ?: return
-//        val updatedAugmentedImages = frame.getUpdatedTrackables(AugmentedImage::class.java)
-//        for (augImage in updatedAugmentedImages) {
-//            if (augImage.trackingState == TrackingState.TRACKING && !recognizedImages.contains(augImage)) {
-//                // Проверяем, является ли распознанное изображение нашим маркером
-//                val imageName = augImage.name  // имя, присвоенное в базе AugmentedImages
-//                if (imageName == "SnowflakeMarker") {
-//                    recognizedImages.add(augImage)
-//                    // Создаем якорь и привязываем модель снежинки
-//                    val anchor = augImage.createAnchor(augImage.centerPose)
-//                    val anchorNode = AnchorNode(anchor).apply {
-//                        setParent(arFragment.arSceneView.scene)
-//                    }
-//                    modelRenderables["snowflake.glb"]?.let { model ->
-//                        anchorNode.renderable = model
-//                    }
-//                    // Вызываем колбэк распознавания снежинки
-//                    val snowflakeObj = RecognizedObject(id="snowflake1", name="Новогодняя снежинка", lat=null, lon=null)
-//                    onObjectRecognized(snowflakeObj)
-//                }
-//            }
-//        }
-//    }
-//
-//    /** Загрузка GLB моделей в память */
-//    private fun loadModels() {
-//        val models = listOf("snowflake.glb", "spasskaya_tower.glb", "other_monument.glb")
-//        for (file in models) {
-//            val uri = Uri.parse("models/$file")
-//            ModelRenderable.builder()
-//                .setSource(this, RenderableSource.builder().setSource(this, uri, RenderableSource.SourceType.GLB)
-//                    .setRecenterMode(RenderableSource.RecenterMode.ROOT).build())
-//                .setRegistryId(file)
-//                .build()
-//                .thenAccept { renderable -> modelRenderables[file] = renderable }
-//                .exceptionally { ex ->
-//                    Log.e("AR", "Не удалось загрузить модель $file: ${ex.message}")
-//                    null
-//                }
-//        }
-//    }
-//
-//    /** Запрос данных Firebase и обработка ближайших объектов */
-//    private fun fetchNearbyLandmarks(userLocation: Location, radiusMeters: Double) {
-//        val db = Firebase.firestore
-//        db.collection("landmarks").get()
-//            .addOnSuccessListener { result ->
-//                for (doc in result) {
-//                    val landmark = doc.toObject(Landmark::class.java)
-//                    landmarksMap[landmark.id] = landmark
-//                    // Добавляем метку на карту
-//                    addMarkerToMap(landmark)
-//                    // Проверяем расстояние до пользователя
-//                    val dist = distanceBetween(userLocation.latitude, userLocation.longitude, landmark.lat, landmark.lon)
-//                    if (dist <= radiusMeters) {
-//                        // Размещаем 3D-модель объекта в AR
-//                        placeLandmarkInAR(userLocation, landmark)
-//                    }
-//                }
-//            }
-//            .addOnFailureListener { e ->
-//                Log.e("Firebase", "Ошибка при получении landmarks: ${e.message}")
-//            }
-//    }
-//
-//    /** Разместить объект (здание/памятник) в AR-сцене по координатам */
-//    private fun placeLandmarkInAR(userLocation: Location, landmark: Landmark) {
-//        // Вычисляем позу (координаты) относительно пользователя
-//        val azimuth = currentAzimuth ?: 0.0
-//        val pose = computeRelativePose(userLocation, azimuth, landmark.lat, landmark.lon)
-//        val anchor = arFragment.arSceneView.session?.createAnchor(pose) ?: return
-//        val anchorNode = AnchorNode(anchor).apply {
-//            setParent(arFragment.arSceneView.scene)
-//        }
-//        // Назначаем 3D модель (если не загружена конкретная, можно поставить общую метку)
-//        val model = modelRenderables[landmark.modelName] ?: modelRenderables["default.glb"]
-//        model?.let { anchorNode.renderable = it }
-//        // Вызов колбэка о распознавании объекта
-//        val recognizedObj = RecognizedObject(id = landmark.id, name = landmark.name, lat = landmark.lat, lon = landmark.lon)
-//        onObjectRecognized(recognizedObj)
-//    }
-//
-//    /** Добавить метку объекта на карту */
-//    private fun addMarkerToMap(landmark: Landmark) {
-//        val mapObjects = mapView.map.mapObjects
-//        val point = Point(landmark.lat, landmark.lon)
-//        mapObjects.addPlacemark(point, ImageProvider.fromResource(this, R.drawable.map_marker))
-//    }
-//
-//    /** Обработка события распознавания объекта */
-//    private fun onObjectRecognized(obj: RecognizedObject) {
-//        // Здесь можно реализовать логику при распознавании: показать информацию и т.д.
-//        Log.d("AR", "Распознан объект: ${obj.name} (id=${obj.id})")
-//        Toast.makeText(this, "Распознан: ${obj.name}", Toast.LENGTH_SHORT).show()
-//    }
-//
-//    /** Вычисление Pose на основе гео-координат */
-//    private fun computeRelativePose(userLoc: Location, userAzimuthDeg: Double, targetLat: Double, targetLon: Double): Pose {
-//        val dLat = Math.toRadians(targetLat - userLoc.latitude)
-//        val dLon = Math.toRadians(targetLon - userLoc.longitude)
-//        val earthR = 6371000.0
-//        val northOffset = dLat * earthR
-//        val eastOffset = dLon * earthR * kotlin.math.cos(Math.toRadians(userLoc.latitude))
-//        // Поворот с учётом азимута (по часовой стрелке)
-//        val azRad = Math.toRadians(userAzimuthDeg)
-//        val localX =  eastOffset * kotlin.math.cos(-azRad) - northOffset * kotlin.math.sin(-azRad)
-//        val localZ =  eastOffset * kotlin.math.sin(-azRad) + northOffset * kotlin.math.cos(-azRad)
-//        val translation = floatArrayOf(localX.toFloat(), 0f, localZ.toFloat())
-//        val rotation = floatArrayOf(0f, 0f, 0f, 1f)
-//        return Pose(translation, rotation)
-//    }
-//
-//    // ... Методы получения currentLocation и currentAzimuth опущены (они должны использовать LocationManager/SensorManager).
-//}
+package com.blackcube.tours.ar
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.blackcube.common.utils.CollectEffect
+import com.blackcube.core.navigation.AppNavigationController
+import com.blackcube.tours.ar.store.ArEffect
+import com.blackcube.tours.ar.store.ArIntent
+import com.blackcube.tours.ar.store.ArState
+import com.google.android.filament.Engine
+import com.google.ar.core.Anchor
+import com.google.ar.core.Config
+import com.google.ar.core.Earth
+import com.google.ar.core.Frame
+import com.google.ar.core.Plane
+import com.google.ar.core.TrackingState
+import io.github.sceneview.ar.ARScene
+import io.github.sceneview.ar.arcore.getUpdatedPlanes
+import io.github.sceneview.ar.node.AnchorNode
+import io.github.sceneview.ar.rememberARCameraNode
+import io.github.sceneview.loaders.MaterialLoader
+import io.github.sceneview.loaders.ModelLoader
+import io.github.sceneview.node.CubeNode
+import io.github.sceneview.node.ModelNode
+import io.github.sceneview.rememberCollisionSystem
+import io.github.sceneview.rememberEngine
+import io.github.sceneview.rememberMaterialLoader
+import io.github.sceneview.rememberModelLoader
+import io.github.sceneview.rememberNodes
+import io.github.sceneview.rememberOnGestureListener
+import io.github.sceneview.rememberView
+import kotlinx.coroutines.flow.Flow
+
+private const val kModelFile = "models/damaged_helmet.glb"
+
+@Composable
+fun ArScreenRoot(
+    navController: AppNavigationController,
+    viewModel: ArViewModel = hiltViewModel()
+) {
+    val state by viewModel.state.collectAsState()
+    val effects = viewModel.effect
+
+    ArScreen(
+        navController = navController,
+        state = state,
+        effects = effects,
+        onIntent = viewModel::handleIntent
+    )
+}
+
+@SuppressLint("MissingPermission")
+@Composable
+fun ArScreen(
+    navController: AppNavigationController,
+    state: ArState,
+    effects: Flow<ArEffect>,
+    onIntent: (ArIntent) -> Unit
+) {
+    CollectEffect(effects) { effect ->
+        when (effect) {
+            ArEffect.NavigateToBack -> navController.popBackStack()
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        val context = LocalContext.current
+
+        val engine = rememberEngine()
+        val modelLoader = rememberModelLoader(engine)
+        val materialLoader = rememberMaterialLoader(engine)
+        val cameraNode = rememberARCameraNode(engine)
+        val childNodes = rememberNodes()
+        val view = rememberView(engine)
+        val collisionSystem = rememberCollisionSystem(view)
+
+        var earthInstance by remember { mutableStateOf<Earth?>(null) }
+
+        var frame by remember { mutableStateOf<Frame?>(null) }
+
+        ARScene(
+            modifier = Modifier.fillMaxSize(),
+            childNodes = childNodes,
+            engine = engine,
+            view = view,
+            modelLoader = modelLoader,
+            collisionSystem = collisionSystem,
+            cameraNode = cameraNode,
+            sessionConfiguration = { session, config ->
+                config.depthMode = Config.DepthMode.AUTOMATIC
+                config.planeFindingMode = Config.PlaneFindingMode.HORIZONTAL
+                config.instantPlacementMode = Config.InstantPlacementMode.LOCAL_Y_UP
+                config.lightEstimationMode = Config.LightEstimationMode.ENVIRONMENTAL_HDR
+                if (session.isGeospatialModeSupported(Config.GeospatialMode.ENABLED)) {
+                    config.geospatialMode = Config.GeospatialMode.ENABLED
+                }
+            },
+            onSessionCreated = { session ->
+                earthInstance = session.earth
+            },
+            onSessionUpdated = { session, updatedFrame ->
+                frame = updatedFrame
+
+                // 1. Проверяем геозону
+                val earth = earthInstance
+                if (
+                    earth != null
+                    && earth.trackingState == TrackingState.TRACKING
+                    && updatedFrame.camera.trackingState == TrackingState.TRACKING
+                    && childNodes.isEmpty()
+                    )
+                {
+                    val geoPose = earth.cameraGeospatialPose
+                    onIntent(ArIntent.UpdateLocation(geoPose.latitude, geoPose.longitude))
+
+                    if (state.inZone) {
+                        Log.d("debugTag", "IN LOCATION")
+                        val plane = updatedFrame
+                            .getUpdatedPlanes()
+                            .firstOrNull { it.trackingState == TrackingState.TRACKING
+                                    && it.type == Plane.Type.HORIZONTAL_UPWARD_FACING }
+
+                        plane?.let {
+                            Log.d("debugTag", "PLANE FOUND")
+                            val anchor = it.createAnchor(it.centerPose)
+                            childNodes += createAnchorNode(
+                                engine = engine,
+                                modelLoader = modelLoader,
+                                materialLoader = materialLoader,
+                                anchor = anchor
+                            )
+                        }
+                    }
+
+                }
+            },
+            onGestureListener = rememberOnGestureListener(
+                onSingleTapConfirmed = { motionEvent, node ->
+                    earthInstance?.let { earth ->
+                        val geoPose = earth.cameraGeospatialPose
+                        val currentLat = geoPose.latitude
+                        val currentLon = geoPose.longitude
+                        Log.d("debugTag", "lat $currentLat, lon $currentLon")
+                        showToast(context, "lat $currentLat, lon $currentLon")
+                    }
+                })
+        )
+    }
+}
+
+fun createAnchorNode(
+    engine: Engine,
+    modelLoader: ModelLoader,
+    materialLoader: MaterialLoader,
+    anchor: Anchor
+): AnchorNode {
+    val anchorNode = AnchorNode(engine = engine, anchor = anchor)
+    val modelNode = ModelNode(
+        modelInstance = modelLoader.createModelInstance(kModelFile),
+        // Scale to fit in a 0.5 meters cube
+        scaleToUnits = 0.5f
+    ).apply {
+        // Model Node needs to be editable for independent rotation from the anchor rotation
+        isEditable = true
+        editableScaleRange = 0.2f..0.75f
+    }
+    val boundingBoxNode = CubeNode(
+        engine,
+        size = modelNode.extents,
+        center = modelNode.center,
+        materialInstance = materialLoader.createColorInstance(Color.White.copy(alpha = 0.5f))
+    ).apply {
+        isVisible = false
+    }
+    modelNode.addChildNode(boundingBoxNode)
+    anchorNode.addChildNode(modelNode)
+
+    listOf(modelNode, anchorNode).forEach {
+        it.onEditingChanged = { editingTransforms ->
+            boundingBoxNode.isVisible = editingTransforms.isNotEmpty()
+        }
+    }
+    return anchorNode
+}
+
+private fun showToast(context: Context, text: String) {
+    Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+}
+
