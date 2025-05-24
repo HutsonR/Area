@@ -31,6 +31,7 @@ import com.blackcube.core.navigation.Screens
 import com.blackcube.home.HomeScreenRoot
 import com.blackcube.places.PlaceIntroScreenRoot
 import com.blackcube.splash.SplashScreenRoot
+import com.blackcube.tours.ar.ArScreenRoot
 import com.blackcube.tours.intro.TourIntroScreenRoot
 import com.blackcube.tours.route.TourRouteScreenRoot
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,11 +61,11 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(isLoggedIn) {
                 if (isLoggedIn) {
                     navController.navigate(Screens.MainScreen.route) {
-                        popUpTo(0)
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 } else {
                     navController.navigate(Screens.LoginScreen.route) {
-                        popUpTo(0)
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 }
             }
@@ -145,6 +146,12 @@ class MainActivity : ComponentActivity() {
                 val itemId = Uri.decode(stackEntry.arguments?.getString("id"))
                 TourRouteScreenRoot(
                     itemId ?: "",
+                    navController = protectedNavController
+                )
+            }
+
+            composable(Screens.ArScreen.route) {
+                ArScreenRoot(
                     navController = protectedNavController
                 )
             }

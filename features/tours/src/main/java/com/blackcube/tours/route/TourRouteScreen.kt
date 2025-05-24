@@ -2,7 +2,7 @@ package com.blackcube.tours.route
 
 import android.Manifest
 import android.app.Activity
-import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -46,11 +46,14 @@ import com.blackcube.common.utils.CollectEffect
 import com.blackcube.common.utils.map.MapUtil.navigateToMap
 import com.blackcube.core.extension.checkPermission
 import com.blackcube.core.navigation.AppNavigationController
+import com.blackcube.core.navigation.Screens
 import com.blackcube.tours.R
-import com.blackcube.tours.ar.ArActivity
+import com.blackcube.tours.ar.ArViewModel.Companion.ARGUMENT_COORDINATES
+import com.blackcube.tours.ar.store.models.Coordinate
 import com.blackcube.tours.common.components.SheetContentHistory
 import com.blackcube.tours.common.components.YandexMapScreen
 import com.blackcube.tours.common.models.HistoryRouteModel
+import com.blackcube.tours.route.TourRouteViewModel.Companion.ARGUMENT_SELECTED_AR_COORDINATE
 import com.blackcube.tours.route.components.MapArButton
 import com.blackcube.tours.route.components.MapControlButton
 import com.blackcube.tours.route.components.SheetContentHistoriesRoute
@@ -71,6 +74,19 @@ fun TourRouteScreenRoot(
 ) {
     val state by viewModel.state.collectAsState()
     val effects = viewModel.effect
+
+    val savedStateFlow = navController.observeArgsAsState<String?>(
+        key = ARGUMENT_SELECTED_AR_COORDINATE,
+        initial = null
+    )
+    val arId by savedStateFlow.collectAsState()
+
+    LaunchedEffect(arId) {
+        arId?.let {
+            Log.d("debugTag", "TourRouteScreenRoot id received: $it")
+            navController.removeSavedArgs<String>(ARGUMENT_SELECTED_AR_COORDINATE)
+        }
+    }
 
     LaunchedEffect(tourId) {
         viewModel.fetchHistories(tourId)
@@ -129,8 +145,32 @@ fun TourRouteScreen(
             }
 
             TourRouteEffect.SwitchArMode -> {
-                val intent = Intent(context, ArActivity::class.java)
-                context.startActivity(intent)
+                val coordinates = listOf(
+                    Coordinate(
+                        id = "2", // dstu
+                        lat = 47.2384213,
+                        lon = 39.7121832
+                    ),
+                    Coordinate(
+                        id = "3", // time
+                        lat = 47.236830,
+                        lon = 39.712408
+                    ),
+                    Coordinate(
+                        id = "4", // home
+                        lat = 47.2367579,
+                        lon = 39.7067851
+                    ),
+                    Coordinate(
+                        id = "5",
+                        lat = 47.236725,
+                        lon = 39.704151
+                    )
+                )
+                navController.navigate(
+                    route = Screens.ArScreen.route,
+                    argument = Pair(ARGUMENT_COORDINATES, coordinates)
+                )
             }
         }
     }

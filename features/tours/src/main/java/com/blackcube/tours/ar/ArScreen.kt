@@ -1,37 +1,55 @@
 package com.blackcube.tours.ar
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.blackcube.common.utils.CollectEffect
 import com.blackcube.core.navigation.AppNavigationController
+import com.blackcube.tours.R
+import com.blackcube.tours.ar.ArViewModel.Companion.ARGUMENT_COORDINATES
 import com.blackcube.tours.ar.store.ArEffect
 import com.blackcube.tours.ar.store.ArIntent
 import com.blackcube.tours.ar.store.ArState
+import com.blackcube.tours.ar.store.models.Coordinate
+import com.blackcube.tours.route.TourRouteViewModel.Companion.ARGUMENT_SELECTED_AR_COORDINATE
 import com.google.android.filament.Engine
 import com.google.ar.core.Anchor
 import com.google.ar.core.Config
 import com.google.ar.core.Earth
-import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import io.github.sceneview.ar.ARScene
 import io.github.sceneview.ar.arcore.getUpdatedPlanes
 import io.github.sceneview.ar.node.AnchorNode
 import io.github.sceneview.ar.rememberARCameraNode
+import io.github.sceneview.ar.rememberARCameraStream
 import io.github.sceneview.loaders.MaterialLoader
 import io.github.sceneview.loaders.ModelLoader
 import io.github.sceneview.node.CubeNode
@@ -45,7 +63,7 @@ import io.github.sceneview.rememberOnGestureListener
 import io.github.sceneview.rememberView
 import kotlinx.coroutines.flow.Flow
 
-private const val kModelFile = "models/damaged_helmet.glb"
+private const val kModelFile = "models/dragon.glb"
 
 @Composable
 fun ArScreenRoot(
@@ -54,6 +72,19 @@ fun ArScreenRoot(
 ) {
     val state by viewModel.state.collectAsState()
     val effects = viewModel.effect
+
+    val savedStateFlow = navController.observeArgsAsState<List<Coordinate>?>(
+        key = ARGUMENT_COORDINATES,
+        initial = null
+    )
+    val coords by savedStateFlow.collectAsState()
+
+    LaunchedEffect(coords) {
+        coords?.let {
+            viewModel.setCoordinates(it)
+            navController.removeSavedArgs<List<Coordinate>>(ARGUMENT_COORDINATES)
+        }
+    }
 
     ArScreen(
         navController = navController,
@@ -74,14 +105,17 @@ fun ArScreen(
     CollectEffect(effects) { effect ->
         when (effect) {
             ArEffect.NavigateToBack -> navController.popBackStack()
+            is ArEffect.NavigateWithId -> {
+                navController.popBackStack(
+                    argument = Pair(ARGUMENT_SELECTED_AR_COORDINATE, effect.id)
+                )
+            }
         }
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
     ) {
-        val context = LocalContext.current
-
         val engine = rememberEngine()
         val modelLoader = rememberModelLoader(engine)
         val materialLoader = rememberMaterialLoader(engine)
@@ -92,8 +126,6 @@ fun ArScreen(
 
         var earthInstance by remember { mutableStateOf<Earth?>(null) }
 
-        var frame by remember { mutableStateOf<Frame?>(null) }
-
         ARScene(
             modifier = Modifier.fillMaxSize(),
             childNodes = childNodes,
@@ -102,11 +134,15 @@ fun ArScreen(
             modelLoader = modelLoader,
             collisionSystem = collisionSystem,
             cameraNode = cameraNode,
+            cameraStream = rememberARCameraStream(materialLoader),
             sessionConfiguration = { session, config ->
-                config.depthMode = Config.DepthMode.AUTOMATIC
                 config.planeFindingMode = Config.PlaneFindingMode.HORIZONTAL
                 config.instantPlacementMode = Config.InstantPlacementMode.LOCAL_Y_UP
                 config.lightEstimationMode = Config.LightEstimationMode.ENVIRONMENTAL_HDR
+                config.depthMode = when (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
+                    true -> Config.DepthMode.AUTOMATIC
+                    else -> Config.DepthMode.DISABLED
+                }
                 if (session.isGeospatialModeSupported(Config.GeospatialMode.ENABLED)) {
                     config.geospatialMode = Config.GeospatialMode.ENABLED
                 }
@@ -115,9 +151,6 @@ fun ArScreen(
                 earthInstance = session.earth
             },
             onSessionUpdated = { session, updatedFrame ->
-                frame = updatedFrame
-
-                // 1. Проверяем геозону
                 val earth = earthInstance
                 if (
                     earth != null
@@ -129,7 +162,8 @@ fun ArScreen(
                     val geoPose = earth.cameraGeospatialPose
                     onIntent(ArIntent.UpdateLocation(geoPose.latitude, geoPose.longitude))
 
-                    if (state.inZone) {
+                    val nearest = state.selectedCoordinate
+                    if (state.inZone && nearest != null) {
                         Log.d("debugTag", "IN LOCATION")
                         val plane = updatedFrame
                             .getUpdatedPlanes()
@@ -143,7 +177,8 @@ fun ArScreen(
                                 engine = engine,
                                 modelLoader = modelLoader,
                                 materialLoader = materialLoader,
-                                anchor = anchor
+                                anchor = anchor,
+                                pointId = nearest.id
                             )
                         }
                     }
@@ -152,15 +187,39 @@ fun ArScreen(
             },
             onGestureListener = rememberOnGestureListener(
                 onSingleTapConfirmed = { motionEvent, node ->
-                    earthInstance?.let { earth ->
-                        val geoPose = earth.cameraGeospatialPose
-                        val currentLat = geoPose.latitude
-                        val currentLon = geoPose.longitude
-                        Log.d("debugTag", "lat $currentLat, lon $currentLon")
-                        showToast(context, "lat $currentLat, lon $currentLon")
+                    val anchorNode = when (node) {
+                        is AnchorNode -> node
+                        else -> node?.parent as? AnchorNode
+                    }
+
+                    anchorNode?.name?.let {
+                        onIntent(ArIntent.OnNodeClick(it))
                     }
                 })
         )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(vertical = 86.dp, horizontal = 24.dp)
+                .background(Color.Black.copy(alpha = 0.6f), shape = RoundedCornerShape(8.dp))
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Text(
+                textAlign = TextAlign.Center,
+                color = Color.White,
+                fontSize = 16.sp,
+                text = if (childNodes.isEmpty()) {
+                    stringResource(R.string.scan_with_phone)
+                } else {
+                    stringResource(R.string.tap_to_scan_model)
+                }
+            )
+        }
+
+        BackButton {
+            onIntent(ArIntent.OnBackClick)
+        }
     }
 }
 
@@ -168,15 +227,16 @@ fun createAnchorNode(
     engine: Engine,
     modelLoader: ModelLoader,
     materialLoader: MaterialLoader,
-    anchor: Anchor
+    anchor: Anchor,
+    pointId: String
 ): AnchorNode {
-    val anchorNode = AnchorNode(engine = engine, anchor = anchor)
+    val anchorNode = AnchorNode(engine = engine, anchor = anchor).apply {
+        name = pointId
+    }
     val modelNode = ModelNode(
         modelInstance = modelLoader.createModelInstance(kModelFile),
-        // Scale to fit in a 0.5 meters cube
         scaleToUnits = 0.5f
     ).apply {
-        // Model Node needs to be editable for independent rotation from the anchor rotation
         isEditable = true
         editableScaleRange = 0.2f..0.75f
     }
@@ -199,7 +259,22 @@ fun createAnchorNode(
     return anchorNode
 }
 
-private fun showToast(context: Context, text: String) {
-    Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+@Composable
+fun BackButton(
+    onBackClick: () -> Unit
+) {
+    IconButton(
+        onClick = { onBackClick.invoke() },
+        modifier = Modifier
+            .padding(start = 20.dp, top = 40.dp)
+            .shadow(8.dp, shape = CircleShape)
+            .background(Color.White, shape = CircleShape)
+            .size(42.dp)
+    ) {
+        Icon(
+            Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "Back",
+            tint = Color.Black
+        )
+    }
 }
-

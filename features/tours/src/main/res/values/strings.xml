@@ -29,6 +29,6 @@
     <string name="permission_location_message">Для использования этой функции необходимо предоставить доступ к вашей локации.\nПожалуйста, перейдите в настройки приложения и включите разрешение.</string>
 
     <!--  AR  -->
-    <string name="point_your_phone_down">Наведите ваш телефон медленно на пустое место</string>
-    <string name="tap_anywhere_to_add_model">Нажмите где-угодно, чтобы добавить модель</string>
+    <string name="scan_with_phone">Проведите телефоном, чтобы отсканировать поверхность</string>
+    <string name="tap_to_scan_model">Нажмите на объект после его обнаружения</string>
 </resources>

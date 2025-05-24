@@ -1,5 +1,6 @@
 package com.blackcube.remote.di
 
+import com.blackcube.authorization.api.SessionManager
 import com.blackcube.remote.BuildConfig
 import dagger.Module
 import dagger.Provides
@@ -22,7 +23,7 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideAuthInterceptor(
-        sessionManager: com.blackcube.authorization.api.SessionManager
+        sessionManager: SessionManager
     ): Interceptor = Interceptor { chain ->
         val original: Request = chain.request()
         val path = original.url.encodedPath
