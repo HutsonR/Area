@@ -291,6 +291,7 @@ class TourRouteViewModel @Inject constructor(
     }
 
     companion object {
+        const val ARGUMENT_SELECTED_AR_COORDINATE = "ar_selected_object_id"
         private const val DISTANCE_THRESHOLD = 100
     }
 }

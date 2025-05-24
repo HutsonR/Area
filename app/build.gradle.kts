@@ -33,6 +33,7 @@ android {
         }
 
         buildConfigField("String", "MAPKIT_API_KEY", mapkitApiKey)
+        manifestPlaceholders["arRequired"] = "required"
     }
 
     buildTypes {

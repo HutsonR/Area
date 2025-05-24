@@ -8,7 +8,7 @@
 
     <uses-feature
         android:name="android.hardware.camera.ar"
-        android:required="true" />
+        android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -29,7 +29,11 @@
         tools:targetApi="35">
         <meta-data
             android:name="com.google.ar.core"
-            android:value="required" />
+            android:value="optional" />
+
+        <meta-data
+            android:name="com.google.ar.core.api_key"
+            android:value="AIzaSyD2Jb21JOlm9TWGc51bmmNGBxvtvHBrZNg"/>
 
         <activity
             android:name=".MainActivity"
