@@ -134,6 +134,7 @@ fun ArScreen(
             modelLoader = modelLoader,
             collisionSystem = collisionSystem,
             cameraNode = cameraNode,
+            planeRenderer = false,
             cameraStream = rememberARCameraStream(materialLoader),
             sessionConfiguration = { session, config ->
                 config.planeFindingMode = Config.PlaneFindingMode.HORIZONTAL

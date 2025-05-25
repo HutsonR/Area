@@ -12,5 +12,6 @@ data class TourRouteState(
     val currentLocation: Point? = null,
     val routeProgress: Float = 0F,
     val isTourStarted: Boolean = false,
+    val arFounded: Pair<Int, Int>? = null,
     val mapPoints: List<MapPoint> = emptyList()
 )

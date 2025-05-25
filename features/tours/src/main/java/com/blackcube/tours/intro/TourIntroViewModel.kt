@@ -3,6 +3,7 @@ package com.blackcube.tours.intro
 import androidx.lifecycle.viewModelScope
 import com.blackcube.common.utils.map.MapUseCase
 import com.blackcube.core.BaseViewModel
+import com.blackcube.models.tours.ArObjectModel
 import com.blackcube.remote.repository.tours.TourRepository
 import com.blackcube.tours.intro.store.models.TourIntroEffect
 import com.blackcube.tours.intro.store.models.TourIntroIntent
@@ -28,9 +29,14 @@ class TourIntroViewModel @Inject constructor(
                     val countCompletedHistories = histories.count { it.isCompleted }
                     countCompletedHistories.toFloat() / histories.size
                 }
+                val arFounded = tourModel.arObjects?.let {
+                    calcArFounded(it)
+                }
+
                 modifyState {
                     copy(
                         tourModel = tourModel,
+                        arFounded = arFounded,
                         tourProgress = progress
                     )
                 }
@@ -49,6 +55,12 @@ class TourIntroViewModel @Inject constructor(
         } ?: run {
             effect(TourIntroEffect.ShowAlert)
         }
+    }
+
+    private fun calcArFounded(arObjectModels: List<ArObjectModel>): Pair<Int, Int> {
+        val founded = arObjectModels.count { it.isScanned }
+        val total = arObjectModels.size
+        return Pair(founded, total)
     }
 
     fun handleIntent(tourIntroIntent: TourIntroIntent) {

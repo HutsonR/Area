@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,6 +42,7 @@ import com.blackcube.tours.common.models.HistoryRouteModel
 fun SheetContentHistoriesRoute(
     historyRouteModel: HistoryRouteModel,
     isTourStarted: Boolean = false,
+    arObjectCount: Pair<Int, Int>? = null,
     onStartTourClick: () -> Unit,
     onHistoryItemClick: (HistoryModel) -> Unit,
     onOptionsClick: (HistoryModel) -> Unit
@@ -56,21 +58,33 @@ fun SheetContentHistoriesRoute(
         ) {
             item {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(color = colorResource(id = com.blackcube.common.R.color.white))
                 ) {
                     Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp),
                         text = stringResource(id = R.string.history_route_title),
                         color = colorResource(id = com.blackcube.common.R.color.title_color),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Black,
-                        modifier = Modifier.padding(bottom = 20.dp)
+                        textAlign = TextAlign.Center
                     )
 
                     Box(modifier = Modifier.padding(start = 20.dp, bottom = 10.dp, end = 20.dp)) {
                         GradientLinearProgressIndicator(historyRouteModel.progress)
+                    }
+
+                    arObjectCount?.let {
+                        Text(
+                            modifier = Modifier.padding(start = 20.dp),
+                            text = "Собрано мультяшек ${it.first} / ${it.second}",
+                            fontWeight = FontWeight.Normal,
+                            color = colorResource(com.blackcube.common.R.color.description_color),
+                            fontSize = 14.sp
+                        )
                     }
                 }
             }
@@ -207,6 +221,7 @@ fun PreviewScreenHistoriesRoute() {
                 )
             )
         ),
+        arObjectCount = Pair(1, 2),
         onStartTourClick = {},
         onHistoryItemClick = {},
         onOptionsClick = {}

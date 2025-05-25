@@ -2,7 +2,7 @@ package com.blackcube.tours.route
 
 import android.Manifest
 import android.app.Activity
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -49,7 +49,6 @@ import com.blackcube.core.navigation.AppNavigationController
 import com.blackcube.core.navigation.Screens
 import com.blackcube.tours.R
 import com.blackcube.tours.ar.ArViewModel.Companion.ARGUMENT_COORDINATES
-import com.blackcube.tours.ar.store.models.Coordinate
 import com.blackcube.tours.common.components.SheetContentHistory
 import com.blackcube.tours.common.components.YandexMapScreen
 import com.blackcube.tours.common.models.HistoryRouteModel
@@ -74,6 +73,7 @@ fun TourRouteScreenRoot(
 ) {
     val state by viewModel.state.collectAsState()
     val effects = viewModel.effect
+    val context = LocalContext.current
 
     val savedStateFlow = navController.observeArgsAsState<String?>(
         key = ARGUMENT_SELECTED_AR_COORDINATE,
@@ -81,9 +81,13 @@ fun TourRouteScreenRoot(
     )
     val arId by savedStateFlow.collectAsState()
 
+    val textArFound = stringResource(R.string.ar_object_found)
     LaunchedEffect(arId) {
         arId?.let {
-            Log.d("debugTag", "TourRouteScreenRoot id received: $it")
+            viewModel.handleIntent(
+                TourRouteIntent.OnArObjectFound(it)
+            )
+            Toast.makeText(context, textArFound, Toast.LENGTH_SHORT).show()
             navController.removeSavedArgs<String>(ARGUMENT_SELECTED_AR_COORDINATE)
         }
     }
@@ -144,32 +148,10 @@ fun TourRouteScreen(
                 konfettiPartyList = effect.party
             }
 
-            TourRouteEffect.SwitchArMode -> {
-                val coordinates = listOf(
-                    Coordinate(
-                        id = "2", // dstu
-                        lat = 47.2384213,
-                        lon = 39.7121832
-                    ),
-                    Coordinate(
-                        id = "3", // time
-                        lat = 47.236830,
-                        lon = 39.712408
-                    ),
-                    Coordinate(
-                        id = "4", // home
-                        lat = 47.2367579,
-                        lon = 39.7067851
-                    ),
-                    Coordinate(
-                        id = "5",
-                        lat = 47.236725,
-                        lon = 39.704151
-                    )
-                )
+            is TourRouteEffect.SwitchArMode -> {
                 navController.navigate(
                     route = Screens.ArScreen.route,
-                    argument = Pair(ARGUMENT_COORDINATES, coordinates)
+                    argument = Pair(ARGUMENT_COORDINATES, effect.coordinates)
                 )
             }
         }
@@ -266,6 +248,7 @@ fun TourRouteScreen(
                         histories = state.tourModel?.histories ?: emptyList()
                     ),
                     isTourStarted = state.isTourStarted,
+                    arObjectCount = state.arFounded,
                     onHistoryItemClick = {
                         activity?.let { activity ->
                             checkPermission(

@@ -1,6 +1,7 @@
 package com.blackcube.tours.route.store
 
 import com.blackcube.common.ui.AlertData
+import com.blackcube.tours.ar.store.models.Coordinate
 import nl.dionsegijn.konfetti.core.Party
 
 sealed interface TourRouteEffect {
@@ -18,5 +19,7 @@ sealed interface TourRouteEffect {
         val party: List<Party>
     ) : TourRouteEffect
 
-    data object SwitchArMode : TourRouteEffect
+    data class SwitchArMode(
+        val coordinates: List<Coordinate>
+    ) : TourRouteEffect
 }
