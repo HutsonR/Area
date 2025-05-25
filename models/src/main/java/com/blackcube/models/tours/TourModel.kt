@@ -13,6 +13,7 @@ package com.blackcube.models.tours
  * @property isStarted Флаг, указывающий, был ли начат тур
  * @property isAR Флаг, указывающий, поддерживает ли тур дополненную реальность (AR)
  * @property histories Список историй, связанных с туром
+ * @property arObjects Список объектов, связанных с AR
  */
 data class TourModel(
     val id: String,
@@ -24,5 +25,6 @@ data class TourModel(
     val isCompleted: Boolean,
     val isStarted: Boolean,
     val isAR: Boolean,
-    val histories: List<HistoryModel>
+    val histories: List<HistoryModel>,
+    val arObjects: List<ArObjectModel>?
 )

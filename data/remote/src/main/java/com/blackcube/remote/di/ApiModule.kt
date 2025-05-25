@@ -3,6 +3,7 @@ package com.blackcube.remote.di
 import com.blackcube.remote.api.auth.AuthApi
 import com.blackcube.remote.api.encryption.EncryptionApi
 import com.blackcube.remote.api.places.PlacesApi
+import com.blackcube.remote.api.tours.ArApi
 import com.blackcube.remote.api.tours.ToursApi
 import com.blackcube.remote.api.tts.TtsApi
 import dagger.Module
@@ -25,6 +26,12 @@ class ApiModule {
     @Singleton
     fun provideTourApi(retrofit: Retrofit): ToursApi {
         return retrofit.create(ToursApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideArApi(retrofit: Retrofit): ArApi {
+        return retrofit.create(ArApi::class.java)
     }
 
     @Provides

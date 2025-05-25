@@ -8,7 +8,9 @@ import javax.inject.Inject
 interface TourRepository {
     suspend fun getTours(limit: String? = null): List<TourModel>
     suspend fun getTourById(id: String): TourModel?
-    suspend fun updateTour(id: String, tour: TourModel): Boolean
+    suspend fun startTour(tourId: String): Boolean
+    suspend fun finishTour(tourId: String): Boolean
+    suspend fun completeHistory(historyId: String): Boolean
 }
 
 class TourRepositoryImpl @Inject constructor(
@@ -27,9 +29,27 @@ class TourRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateTour(id: String, tour: TourModel): Boolean {
+    override suspend fun startTour(tourId: String): Boolean {
         return try {
-            val response: Response<Unit> = toursApi.updateTour(id, tour)
+            val response: Response<Unit> = toursApi.startTour(tourId)
+            response.isSuccessful
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun finishTour(tourId: String): Boolean {
+        return try {
+            val response: Response<Unit> = toursApi.finishTour(tourId)
+            response.isSuccessful
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun completeHistory(historyId: String): Boolean {
+        return try {
+            val response: Response<Unit> = toursApi.completeHistory(historyId)
             response.isSuccessful
         } catch (e: Exception) {
             false

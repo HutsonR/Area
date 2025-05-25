@@ -7,9 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.blackcube.common.ui.AlertData
 import com.blackcube.common.utils.map.MapUseCase
 import com.blackcube.core.BaseViewModel
+import com.blackcube.models.tours.ArObjectModel
 import com.blackcube.models.tours.HistoryModel
+import com.blackcube.remote.repository.tours.ArRepository
 import com.blackcube.remote.repository.tours.TourRepository
 import com.blackcube.tours.R
+import com.blackcube.tours.ar.store.models.Coordinate
 import com.blackcube.tours.common.components.MapPoint
 import com.blackcube.tours.route.store.TourRouteEffect
 import com.blackcube.tours.route.store.TourRouteIntent
@@ -29,6 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TourRouteViewModel @Inject constructor(
     private val tourRepository: TourRepository,
+    private val arRepository: ArRepository,
     private val mapUseCase: MapUseCase,
     @ApplicationContext private val appContext: Context
 ) : BaseViewModel<TourRouteState, TourRouteEffect>(TourRouteState()) {
@@ -63,10 +67,14 @@ class TourRouteViewModel @Inject constructor(
                         AlertData(action = { effect(TourRouteEffect.NavigateToBack) })
                     )
                 )
+                val arFounded = tourModel.arObjects?.let {
+                    calcArFounded(it)
+                }
 
                 modifyState {
                     copy(
                         tourModel = tourModel,
+                        arFounded = arFounded,
                         routeProgress = calculateTourProgress(tourModel.histories),
                         mapPoints = tourModel.histories.toMapPoints()
                     )
@@ -103,7 +111,18 @@ class TourRouteViewModel @Inject constructor(
 
             TourRouteIntent.ShowAlert -> effect(TourRouteEffect.ShowAlert())
 
-            TourRouteIntent.OnArClick -> effect(TourRouteEffect.SwitchArMode)
+            TourRouteIntent.OnArClick -> {
+                val arObjectModels = getState().tourModel?.arObjects
+                if (arObjectModels != null) {
+                    effect(
+                        TourRouteEffect.SwitchArMode(arObjectModels.convertNotFoundArToCoordinates())
+                    )
+                } else {
+                    effect(
+                        TourRouteEffect.ShowAlert()
+                    )
+                }
+            }
 
             is TourRouteIntent.OnMoveLocationClick -> setCurrentLocation(
                 tourRouteIntent.lat,
@@ -128,6 +147,41 @@ class TourRouteViewModel @Inject constructor(
                     )
                 }
             }
+
+            is TourRouteIntent.OnArObjectFound -> handleArObject(tourRouteIntent.id)
+        }
+    }
+
+    private fun calcArFounded(arObjectModels: List<ArObjectModel>): Pair<Int, Int> {
+        val founded = arObjectModels.count { it.isScanned }
+        val total = arObjectModels.size
+        return Pair(founded, total)
+    }
+
+    private fun List<ArObjectModel>.convertNotFoundArToCoordinates(): List<Coordinate> =
+        this
+            .filter { it.isScanned.not() }
+            .map {
+                Coordinate(
+                    id = it.id,
+                    lat = it.lat,
+                    lon = it.lon
+                )
+            }
+
+    private fun handleArObject(id: String) {
+        viewModelScope.launch {
+            getState().tourModel?.run {
+                val updated = copy(
+                    arObjects = arObjects?.map { obj ->
+                        if (obj.id == id) obj.copy(isScanned = true) else obj
+                    }
+                )
+
+                modifyState { copy(tourModel = updated) }
+            } ?: return@launch effect(TourRouteEffect.ShowAlert())
+
+            arRepository.scanAr(id)
         }
     }
 
@@ -161,7 +215,7 @@ class TourRouteViewModel @Inject constructor(
             val tourModel = getState().tourModel ?: return@launch effect(TourRouteEffect.ShowAlert())
             val newTourModel = tourModel.copy(isStarted = true)
             if (tourModel.isStarted.not()) {
-                tourRepository.updateTour(newTourModel.id, newTourModel)
+                tourRepository.startTour(newTourModel.id)
             }
 
             modifyState {
@@ -237,6 +291,8 @@ class TourRouteViewModel @Inject constructor(
                         }
                     } ?: return@launch effect(TourRouteEffect.ShowAlert())
 
+                    tourRepository.completeHistory(foundHistory.id)
+
                     val tourIsCompleted = newHistories.count { it.isCompleted }.let { countCompletedHistories ->
                         newHistories.size == countCompletedHistories
                     }
@@ -245,7 +301,6 @@ class TourRouteViewModel @Inject constructor(
                         histories = newHistories
                     ) ?: return@launch effect(TourRouteEffect.ShowAlert())
 
-                    tourRepository.updateTour(newTourModel.id, newTourModel)
                     modifyState {
                         copy(
                             tourModel = newTourModel,
@@ -259,6 +314,7 @@ class TourRouteViewModel @Inject constructor(
                     ).show()
 
                     if (tourIsCompleted) {
+                        tourRepository.finishTour(newTourModel.id)
                         Toast.makeText(
                             appContext,
                             appContext.getString(R.string.history_route_complete),

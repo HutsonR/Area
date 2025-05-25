@@ -25,4 +25,8 @@ sealed interface TourRouteIntent {
     data object ShowAlert : TourRouteIntent
 
     data object OnArClick : TourRouteIntent
+
+    data class OnArObjectFound(
+        val id: String
+    ) : TourRouteIntent
 }

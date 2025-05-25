@@ -185,7 +185,10 @@ fun TourIntroScreen(
                     isCompleted = tourModel.isCompleted
                 )
 
-                ArAvailableBlock(isArAvailable = tourModel.isAR)
+                ArAvailableBlock(
+                    isArAvailable = tourModel.isAR,
+                    arObjectCount = state.arFounded
+                )
             }
             item {
                 SectionTitle(
@@ -485,7 +488,8 @@ fun Header(
 
 @Composable
 fun ArAvailableBlock(
-    isArAvailable: Boolean
+    isArAvailable: Boolean,
+    arObjectCount: Pair<Int, Int>? = null
 ) {
     if (!isArAvailable) return
     Row(
@@ -519,6 +523,17 @@ fun ArAvailableBlock(
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White
+        )
+    }
+
+    arObjectCount?.let {
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            modifier = Modifier.padding(start = 20.dp),
+            text = "Собрано мультяшек ${it.first} / ${it.second}",
+            fontWeight = FontWeight.Normal,
+            color = colorResource(com.blackcube.common.R.color.title_color),
+            fontSize = 14.sp
         )
     }
 }
