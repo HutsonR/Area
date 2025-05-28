@@ -18,6 +18,7 @@
 
     <string name="adventure_title">Мои приключения</string>
     <string name="adventure_text">Хотите посмотреть на все туры и места, в которых побывали?</string>
+    <string name="adventure_button">В профиль</string>
 
     <string name="button_continue">Продолжить</string>
     <string name="button_ofcourse">Конечно</string>

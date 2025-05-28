@@ -110,6 +110,8 @@ fun HomeScreen(
             HomeEffect.ShowAlert -> {
                 isAlertVisible = true
             }
+
+            HomeEffect.NavigateToProfile -> navController.navigate(Screens.ProfileScreen.route)
         }
     }
 
@@ -161,16 +163,18 @@ fun HomeScreen(
             }
         }
 
-        item {
-            MyAdventuresSection {
-                onIntent(HomeIntent.OnSeeStatsClick)
-            }
-        }
-
         if (state.isLoading) {
             item {
                 Spacer(modifier = Modifier.height(24.dp))
                 ShowProgressIndicator(state.isLoading)
+            }
+        }
+
+        if (!state.isLoading && state.placesItems.isNotEmpty() || state.tourItems.isNotEmpty()) {
+            item {
+                MyAdventuresSection {
+                    onIntent(HomeIntent.OnSeeStatsClick)
+                }
             }
         }
 
@@ -441,7 +445,7 @@ fun MyAdventuresSection(
                     onClick = onClick,
                     backgroundColor = Color.White,
                     textColor = Color.Black,
-                    text = stringResource(id = R.string.button_ofcourse)
+                    text = stringResource(id = R.string.adventure_button)
                 )
             }
         }

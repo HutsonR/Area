@@ -30,6 +30,7 @@ import com.blackcube.core.extension.defaultPermissionRequestCode
 import com.blackcube.core.navigation.Screens
 import com.blackcube.home.HomeScreenRoot
 import com.blackcube.places.PlaceIntroScreenRoot
+import com.blackcube.profile.ProfileScreenRoot
 import com.blackcube.splash.SplashScreenRoot
 import com.blackcube.tours.ar.ArScreenRoot
 import com.blackcube.tours.intro.TourIntroScreenRoot
@@ -152,6 +153,12 @@ class MainActivity : ComponentActivity() {
 
             composable(Screens.ArScreen.route) {
                 ArScreenRoot(
+                    navController = protectedNavController
+                )
+            }
+
+            composable(Screens.ProfileScreen.route) {
+                ProfileScreenRoot(
                     navController = protectedNavController
                 )
             }

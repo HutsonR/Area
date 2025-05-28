@@ -28,4 +28,6 @@ sealed class Screens(val route: String) {
     }
 
     data object ArScreen : Screens("ar")
+
+    data object ProfileScreen : Screens("profile")
 }

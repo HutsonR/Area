@@ -4,6 +4,8 @@ import com.blackcube.remote.repository.auth.AuthRepository
 import com.blackcube.remote.repository.auth.AuthRepositoryImpl
 import com.blackcube.remote.repository.places.PlaceRepository
 import com.blackcube.remote.repository.places.PlaceRepositoryImpl
+import com.blackcube.remote.repository.profile.ProfileRepository
+import com.blackcube.remote.repository.profile.ProfileRepositoryImpl
 import com.blackcube.remote.repository.tours.ArRepository
 import com.blackcube.remote.repository.tours.ArRepositoryImpl
 import com.blackcube.remote.repository.tours.TourRepository
@@ -33,5 +35,8 @@ interface RepositoryModule {
 
     @Binds
     fun bindAuthRepository(authRepositoryImpl: AuthRepositoryImpl): AuthRepository
+
+    @Binds
+    fun bindProfileRepository(profileRepositoryImpl: ProfileRepositoryImpl): ProfileRepository
 
 }
