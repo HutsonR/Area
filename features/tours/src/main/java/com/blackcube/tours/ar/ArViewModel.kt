@@ -47,11 +47,11 @@ class ArViewModel @Inject constructor() : BaseViewModel<ArState, ArEffect>(ArSta
         modifyState { copy(coordinates = coordinates) }
     }
 
-    fun handleIntent(tourRouteIntent: ArIntent) {
-        when (tourRouteIntent) {
+    fun handleIntent(intent: ArIntent) {
+        when (intent) {
             ArIntent.OnBackClick -> effect(ArEffect.NavigateToBack)
-            is ArIntent.UpdateLocation -> updateLocation(tourRouteIntent.lat, tourRouteIntent.lon)
-            is ArIntent.OnNodeClick -> effect(ArEffect.NavigateWithId(tourRouteIntent.id))
+            is ArIntent.UpdateLocation -> updateLocation(intent.lat, intent.lon)
+            is ArIntent.OnNodeClick -> effect(ArEffect.NavigateWithId(intent.id))
         }
     }
 

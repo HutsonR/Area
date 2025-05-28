@@ -31,4 +31,6 @@
     <color name="button_background_dark_gray">#E0E0E0</color>
 
     <color name="player_background">#F6F6F6</color>
+
+    <color name="background_red">#FF5959</color>
 </resources>

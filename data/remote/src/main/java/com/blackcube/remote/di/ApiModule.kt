@@ -3,6 +3,7 @@ package com.blackcube.remote.di
 import com.blackcube.remote.api.auth.AuthApi
 import com.blackcube.remote.api.encryption.EncryptionApi
 import com.blackcube.remote.api.places.PlacesApi
+import com.blackcube.remote.api.profile.ProfileApi
 import com.blackcube.remote.api.tours.ArApi
 import com.blackcube.remote.api.tours.ToursApi
 import com.blackcube.remote.api.tts.TtsApi
@@ -50,5 +51,11 @@ class ApiModule {
     @Singleton
     fun provideEncryptionApi(retrofit: Retrofit): EncryptionApi {
         return retrofit.create(EncryptionApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileApi(retrofit: Retrofit): ProfileApi {
+        return retrofit.create(ProfileApi::class.java)
     }
 }

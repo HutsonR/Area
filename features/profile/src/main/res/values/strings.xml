@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_title">Профиль</string>
+    <string name="profile_stats_empty">Пока нет достижений\nСамое время проходить туры</string>
+
+    <string name="profile_stats_title">Статистика</string>
+    <string name="profile_stats_ar">Собранные AR мультяшки</string>
+    <string name="profile_stats_tours">Пройденные туры</string>
+    <string name="profile_stats_histories">Пройденные истории</string>
+
+    <string name="profile_exit">Выход</string>
+</resources>

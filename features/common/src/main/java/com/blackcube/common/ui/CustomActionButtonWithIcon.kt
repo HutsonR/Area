@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun CustomActionButtonWithIcon(
+    modifier: Modifier = Modifier,
     backgroundColor: Color,
     textColor: Color,
     iconColor: Color,
@@ -30,7 +31,7 @@ fun CustomActionButtonWithIcon(
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(46.dp),
         shape = RoundedCornerShape(12.dp),
@@ -42,7 +43,7 @@ fun CustomActionButtonWithIcon(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween, // Разместить элементы по краям
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             val color = if (isActive) {

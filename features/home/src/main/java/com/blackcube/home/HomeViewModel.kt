@@ -77,7 +77,7 @@ class HomeViewModel @Inject constructor(
                 } ?: effect(HomeEffect.ShowAlert)
             }
 
-            HomeIntent.OnSeeStatsClick -> Unit // todo навигация в профиль со статистикой
+            HomeIntent.OnSeeStatsClick -> effect(HomeEffect.NavigateToProfile)
 
             HomeIntent.Reload -> fetchData()
         }
