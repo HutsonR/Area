@@ -63,8 +63,6 @@ import io.github.sceneview.rememberOnGestureListener
 import io.github.sceneview.rememberView
 import kotlinx.coroutines.flow.Flow
 
-private const val kModelFile = "models/dragon.glb"
-
 @Composable
 fun ArScreenRoot(
     navController: AppNavigationController,
@@ -179,7 +177,8 @@ fun ArScreen(
                                 modelLoader = modelLoader,
                                 materialLoader = materialLoader,
                                 anchor = anchor,
-                                pointId = nearest.id
+                                pointId = nearest.id,
+                                arModelPaths = state.arModelPaths
                             )
                         }
                     }
@@ -229,10 +228,14 @@ fun createAnchorNode(
     modelLoader: ModelLoader,
     materialLoader: MaterialLoader,
     anchor: Anchor,
-    pointId: String
+    pointId: String,
+    arModelPaths: List<String>
 ): AnchorNode {
     val anchorNode = AnchorNode(engine = engine, anchor = anchor).apply {
         name = pointId
+    }
+    val kModelFile = arModelPaths.let {
+        if (it.isNotEmpty()) it.random() else "models/shiba.glb"
     }
     val modelNode = ModelNode(
         modelInstance = modelLoader.createModelInstance(kModelFile),

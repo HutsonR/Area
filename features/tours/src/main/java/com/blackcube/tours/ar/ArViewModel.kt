@@ -14,6 +14,10 @@ import kotlin.math.max
 @HiltViewModel
 class ArViewModel @Inject constructor() : BaseViewModel<ArState, ArEffect>(ArState()) {
 
+    init {
+        modifyState { copy(arModelPaths = listArObjects) }
+    }
+
     private fun updateLocation(lat: Double, lon: Double) {
         if (getState().selectedCoordinate == null) {
             findNearest(lat, lon)?.let {
@@ -60,5 +64,11 @@ class ArViewModel @Inject constructor() : BaseViewModel<ArState, ArEffect>(ArSta
     companion object {
         const val ARGUMENT_COORDINATES = "ar_coordinates"
         private const val METERS_ERROR = 15.0 // погрешность
+
+        private val listArObjects = listOf(
+            "models/cat.glb",
+            "models/dragon.glb",
+            "models/shiba.glb",
+        )
     }
 }
