@@ -1,8 +1,8 @@
 package com.blackcube.remote.api.auth
 
 import com.blackcube.models.auth.TokenModel
-import com.blackcube.remote.models.LoginApiModel
-import com.blackcube.remote.models.RegistrationApiModel
+import com.blackcube.remote.models.auth.LoginApiModel
+import com.blackcube.remote.models.auth.RegistrationApiModel
 import retrofit2.http.Body
 import retrofit2.http.POST
 

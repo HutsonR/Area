@@ -1,4 +1,4 @@
-package com.blackcube.remote.models
+package com.blackcube.remote.models.auth
 
 data class RegistrationApiModel(
     val email: String,

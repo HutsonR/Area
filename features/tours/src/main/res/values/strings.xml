@@ -32,4 +32,9 @@
     <string name="scan_with_phone">Проведите телефоном, чтобы отсканировать поверхность</string>
     <string name="tap_to_scan_model">Нажмите на объект после его обнаружения</string>
     <string name="ar_object_found">Мультяшка найдена!</string>
+    <string name="ar_add_comment">Оставить комментарий</string>
+    <string name="ar_add_comment_dialog_title">Новый комментарий</string>
+    <string name="ar_add_comment_dialog_placeholder">Ваш комментарий</string>
+    <string name="ar_add_comment_dialog_confirm">Добавить</string>
+    <string name="ar_add_comment_dialog_cancel">Отмена</string>
 </resources>

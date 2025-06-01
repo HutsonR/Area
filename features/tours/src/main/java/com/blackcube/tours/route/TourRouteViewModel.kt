@@ -12,7 +12,8 @@ import com.blackcube.models.tours.HistoryModel
 import com.blackcube.remote.repository.tours.ArRepository
 import com.blackcube.remote.repository.tours.TourRepository
 import com.blackcube.tours.R
-import com.blackcube.tours.ar.store.models.Coordinate
+import com.blackcube.tours.ar.store.models.ArModel
+import com.blackcube.tours.ar.store.models.ArType
 import com.blackcube.tours.common.components.MapPoint
 import com.blackcube.tours.route.store.TourRouteEffect
 import com.blackcube.tours.route.store.TourRouteIntent
@@ -115,7 +116,10 @@ class TourRouteViewModel @Inject constructor(
                 val arObjectModels = getState().tourModel?.arObjects
                 if (arObjectModels != null) {
                     effect(
-                        TourRouteEffect.SwitchArMode(arObjectModels.convertNotFoundArToCoordinates())
+                        TourRouteEffect.SwitchArMode(
+                            getState().tourModel?.id ?: "",
+                            arObjectModels.convertArObjectToArModel()
+                        )
                     )
                 } else {
                     effect(
@@ -158,14 +162,16 @@ class TourRouteViewModel @Inject constructor(
         return Pair(founded, total)
     }
 
-    private fun List<ArObjectModel>.convertNotFoundArToCoordinates(): List<Coordinate> =
+    private fun List<ArObjectModel>.convertArObjectToArModel(): List<ArModel> =
         this
             .filter { it.isScanned.not() }
             .map {
-                Coordinate(
+                ArModel(
                     id = it.id,
                     lat = it.lat,
-                    lon = it.lon
+                    lon = it.lon,
+                    content = it.text,
+                    type = if (it.text.isNullOrBlank()) ArType.OBJECT else ArType.TEXT
                 )
             }
 

@@ -151,7 +151,7 @@ fun TourRouteScreen(
             is TourRouteEffect.SwitchArMode -> {
                 navController.navigate(
                     route = Screens.ArScreen.route,
-                    argument = Pair(ARGUMENT_COORDINATES, effect.coordinates)
+                    argument = Pair(ARGUMENT_COORDINATES, Pair(effect.tourId, effect.arModels))
                 )
             }
         }

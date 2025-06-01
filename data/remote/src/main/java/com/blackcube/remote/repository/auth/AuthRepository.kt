@@ -3,8 +3,8 @@ package com.blackcube.remote.repository.auth
 import android.util.Base64
 import com.blackcube.remote.api.auth.AuthApi
 import com.blackcube.remote.api.encryption.EncryptionApi
-import com.blackcube.remote.models.LoginApiModel
-import com.blackcube.remote.models.RegistrationApiModel
+import com.blackcube.remote.models.auth.LoginApiModel
+import com.blackcube.remote.models.auth.RegistrationApiModel
 import com.blackcube.remote.utils.EncryptionUtil
 import javax.inject.Inject
 
