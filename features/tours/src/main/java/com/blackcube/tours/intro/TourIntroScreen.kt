@@ -187,7 +187,8 @@ fun TourIntroScreen(
 
                 ArAvailableBlock(
                     isArAvailable = tourModel.isAR,
-                    arObjectCount = state.arFounded
+                    arObjectCount = state.arFounded,
+                    arScore = state.arScore
                 )
             }
             item {
@@ -489,7 +490,8 @@ fun Header(
 @Composable
 fun ArAvailableBlock(
     isArAvailable: Boolean,
-    arObjectCount: Pair<Int, Int>? = null
+    arObjectCount: Pair<Int, Int>? = null,
+    arScore: Pair<Int, Int>? = null
 ) {
     if (!isArAvailable) return
     Row(
@@ -531,6 +533,16 @@ fun ArAvailableBlock(
         Text(
             modifier = Modifier.padding(start = 20.dp),
             text = "Собрано мультяшек ${it.first} / ${it.second}",
+            fontWeight = FontWeight.Normal,
+            color = colorResource(com.blackcube.common.R.color.title_color),
+            fontSize = 14.sp
+        )
+    }
+    arScore?.let {
+        Spacer(modifier = Modifier.padding(4.dp))
+        Text(
+            modifier = Modifier.padding(start = 20.dp),
+            text = "Очков ${it.first} / ${it.second}",
             fontWeight = FontWeight.Normal,
             color = colorResource(com.blackcube.common.R.color.title_color),
             fontSize = 14.sp

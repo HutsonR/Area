@@ -5,7 +5,7 @@ import com.blackcube.core.BaseViewModel
 import com.blackcube.tours.ar.store.ArEffect
 import com.blackcube.tours.ar.store.ArIntent
 import com.blackcube.tours.ar.store.ArState
-import com.blackcube.tours.ar.store.models.Coordinate
+import com.blackcube.tours.ar.store.models.ArModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.math.cos
@@ -19,13 +19,13 @@ class ArViewModel @Inject constructor() : BaseViewModel<ArState, ArEffect>(ArSta
     }
 
     private fun updateLocation(lat: Double, lon: Double) {
-        if (getState().selectedCoordinate == null) {
+        if (getState().selectedArModel == null) {
             findNearest(lat, lon)?.let {
-                modifyState { copy(selectedCoordinate = it) }
+                modifyState { copy(selectedArModel = it) }
             }
         }
 
-        val nearest = getState().selectedCoordinate ?: return
+        val nearest = getState().selectedArModel ?: return
         val deltaLat = METERS_ERROR / 111_000.0
         val deltaLon = METERS_ERROR / (111_000.0 * cos(nearest.lat.toRadians()))
         val delta = max(deltaLat, deltaLon)
@@ -35,8 +35,8 @@ class ArViewModel @Inject constructor() : BaseViewModel<ArState, ArEffect>(ArSta
         modifyState { copy(inZone = inZone) }
     }
 
-    private fun findNearest(lat: Double, lon: Double): Coordinate? {
-        return getState().coordinates.minByOrNull { coord ->
+    private fun findNearest(lat: Double, lon: Double): ArModel? {
+        return getState().arModels.minByOrNull { coord ->
             val results = FloatArray(1)
             Location.distanceBetween(
                 lat, lon,
@@ -47,8 +47,8 @@ class ArViewModel @Inject constructor() : BaseViewModel<ArState, ArEffect>(ArSta
         }
     }
 
-    fun setCoordinates(coordinates: List<Coordinate>) {
-        modifyState { copy(coordinates = coordinates) }
+    fun setCoordinates(arModels: List<ArModel>) {
+        modifyState { copy(arModels = arModels) }
     }
 
     fun handleIntent(intent: ArIntent) {

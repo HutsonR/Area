@@ -1,6 +1,6 @@
 package com.blackcube.tours.ar.store.models
 
-data class Coordinate(
+data class ArModel(
     val id: String,
     val lat: Double,
     val lon: Double

@@ -32,11 +32,15 @@ class TourIntroViewModel @Inject constructor(
                 val arFounded = tourModel.arObjects?.let {
                     calcArFounded(it)
                 }
+                val arScore = tourModel.arObjects?.let {
+                    calcArScore(it)
+                }
 
                 modifyState {
                     copy(
                         tourModel = tourModel,
                         arFounded = arFounded,
+                        arScore = arScore,
                         tourProgress = progress
                     )
                 }
@@ -61,6 +65,13 @@ class TourIntroViewModel @Inject constructor(
         val founded = arObjectModels.count { it.isScanned }
         val total = arObjectModels.size
         return Pair(founded, total)
+    }
+
+    private fun calcArScore(arObjectModels: List<ArObjectModel>): Pair<Int, Int> {
+        val totalSum = arObjectModels.sumOf { it.points }
+        val foundSum = arObjectModels.filter { it.isScanned }.sumOf { it.points }
+
+        return Pair(foundSum, totalSum)
     }
 
     fun handleIntent(tourIntroIntent: TourIntroIntent) {

@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -43,6 +44,7 @@ fun SheetContentHistoriesRoute(
     historyRouteModel: HistoryRouteModel,
     isTourStarted: Boolean = false,
     arObjectCount: Pair<Int, Int>? = null,
+    arScore: Pair<Int, Int>? = null,
     onStartTourClick: () -> Unit,
     onHistoryItemClick: (HistoryModel) -> Unit,
     onOptionsClick: (HistoryModel) -> Unit
@@ -81,6 +83,16 @@ fun SheetContentHistoriesRoute(
                         Text(
                             modifier = Modifier.padding(start = 20.dp),
                             text = "Собрано мультяшек ${it.first} / ${it.second}",
+                            fontWeight = FontWeight.Normal,
+                            color = colorResource(com.blackcube.common.R.color.description_color),
+                            fontSize = 14.sp
+                        )
+                    }
+                    arScore?.let {
+                        Spacer(modifier = Modifier.padding(4.dp))
+                        Text(
+                            modifier = Modifier.padding(start = 20.dp),
+                            text = "Очков ${it.first} / ${it.second}",
                             fontWeight = FontWeight.Normal,
                             color = colorResource(com.blackcube.common.R.color.description_color),
                             fontSize = 14.sp
@@ -222,6 +234,7 @@ fun PreviewScreenHistoriesRoute() {
             )
         ),
         arObjectCount = Pair(1, 2),
+        arScore = Pair(15, 30),
         onStartTourClick = {},
         onHistoryItemClick = {},
         onOptionsClick = {}
