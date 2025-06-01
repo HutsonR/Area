@@ -37,7 +37,7 @@ import com.blackcube.tours.ar.ArViewModel.Companion.ARGUMENT_COORDINATES
 import com.blackcube.tours.ar.store.ArEffect
 import com.blackcube.tours.ar.store.ArIntent
 import com.blackcube.tours.ar.store.ArState
-import com.blackcube.tours.ar.store.models.Coordinate
+import com.blackcube.tours.ar.store.models.ArModel
 import com.blackcube.tours.route.TourRouteViewModel.Companion.ARGUMENT_SELECTED_AR_COORDINATE
 import com.google.android.filament.Engine
 import com.google.ar.core.Anchor
@@ -71,7 +71,7 @@ fun ArScreenRoot(
     val state by viewModel.state.collectAsState()
     val effects = viewModel.effect
 
-    val savedStateFlow = navController.observeArgsAsState<List<Coordinate>?>(
+    val savedStateFlow = navController.observeArgsAsState<List<ArModel>?>(
         key = ARGUMENT_COORDINATES,
         initial = null
     )
@@ -80,7 +80,7 @@ fun ArScreenRoot(
     LaunchedEffect(coords) {
         coords?.let {
             viewModel.setCoordinates(it)
-            navController.removeSavedArgs<List<Coordinate>>(ARGUMENT_COORDINATES)
+            navController.removeSavedArgs<List<ArModel>>(ARGUMENT_COORDINATES)
         }
     }
 
@@ -161,7 +161,7 @@ fun ArScreen(
                     val geoPose = earth.cameraGeospatialPose
                     onIntent(ArIntent.UpdateLocation(geoPose.latitude, geoPose.longitude))
 
-                    val nearest = state.selectedCoordinate
+                    val nearest = state.selectedArModel
                     if (state.inZone && nearest != null) {
                         Log.d("debugTag", "IN LOCATION")
                         val plane = updatedFrame

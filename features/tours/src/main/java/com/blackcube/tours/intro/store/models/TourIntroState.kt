@@ -8,5 +8,6 @@ data class TourIntroState(
     val tourProgress: Float = 0f,
     val isLoading: Boolean = true,
     val arFounded: Pair<Int, Int>? = null,
+    val arScore: Pair<Int, Int>? = null,
     val selectedHistory: HistoryModel? = null
 )

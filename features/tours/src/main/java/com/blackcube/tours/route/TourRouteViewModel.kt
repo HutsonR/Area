@@ -12,7 +12,7 @@ import com.blackcube.models.tours.HistoryModel
 import com.blackcube.remote.repository.tours.ArRepository
 import com.blackcube.remote.repository.tours.TourRepository
 import com.blackcube.tours.R
-import com.blackcube.tours.ar.store.models.Coordinate
+import com.blackcube.tours.ar.store.models.ArModel
 import com.blackcube.tours.common.components.MapPoint
 import com.blackcube.tours.route.store.TourRouteEffect
 import com.blackcube.tours.route.store.TourRouteIntent
@@ -70,12 +70,16 @@ class TourRouteViewModel @Inject constructor(
                 val arFounded = tourModel.arObjects?.let {
                     calcArFounded(it)
                 }
+                val arScore = tourModel.arObjects?.let {
+                    calcArScore(it)
+                }
 
                 modifyState {
                     copy(
                         tourModel = tourModel,
                         arFounded = arFounded,
                         routeProgress = calculateTourProgress(tourModel.histories),
+                        arScore = arScore,
                         mapPoints = tourModel.histories.toMapPoints()
                     )
                 }
@@ -115,7 +119,7 @@ class TourRouteViewModel @Inject constructor(
                 val arObjectModels = getState().tourModel?.arObjects
                 if (arObjectModels != null) {
                     effect(
-                        TourRouteEffect.SwitchArMode(arObjectModels.convertNotFoundArToCoordinates())
+                        TourRouteEffect.SwitchArMode(arObjectModels.convertArObjectToArModel())
                     )
                 } else {
                     effect(
@@ -158,11 +162,11 @@ class TourRouteViewModel @Inject constructor(
         return Pair(founded, total)
     }
 
-    private fun List<ArObjectModel>.convertNotFoundArToCoordinates(): List<Coordinate> =
+    private fun List<ArObjectModel>.convertArObjectToArModel(): List<ArModel> =
         this
             .filter { it.isScanned.not() }
             .map {
-                Coordinate(
+                ArModel(
                     id = it.id,
                     lat = it.lat,
                     lon = it.lon
@@ -177,12 +181,27 @@ class TourRouteViewModel @Inject constructor(
                         if (obj.id == id) obj.copy(isScanned = true) else obj
                     }
                 )
+                val arScore = arObjects?.let {
+                    calcArScore(it)
+                }
 
-                modifyState { copy(tourModel = updated) }
+                modifyState {
+                    copy(
+                        tourModel = updated,
+                        arScore = arScore
+                    )
+                }
             } ?: return@launch effect(TourRouteEffect.ShowAlert())
 
             arRepository.scanAr(id)
         }
+    }
+
+    private fun calcArScore(arObjectModels: List<ArObjectModel>): Pair<Int, Int> {
+        val totalSum = arObjectModels.sumOf { it.points }
+        val foundSum = arObjectModels.filter { it.isScanned }.sumOf { it.points }
+
+        return Pair(foundSum, totalSum)
     }
 
     private fun setCurrentLocation(

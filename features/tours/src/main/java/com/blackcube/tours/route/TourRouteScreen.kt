@@ -151,7 +151,7 @@ fun TourRouteScreen(
             is TourRouteEffect.SwitchArMode -> {
                 navController.navigate(
                     route = Screens.ArScreen.route,
-                    argument = Pair(ARGUMENT_COORDINATES, effect.coordinates)
+                    argument = Pair(ARGUMENT_COORDINATES, effect.arModels)
                 )
             }
         }
@@ -249,6 +249,7 @@ fun TourRouteScreen(
                     ),
                     isTourStarted = state.isTourStarted,
                     arObjectCount = state.arFounded,
+                    arScore = state.arScore,
                     onHistoryItemClick = {
                         activity?.let { activity ->
                             checkPermission(
